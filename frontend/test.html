@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Connexion Symfony</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: white;
+            color: rgb(0, 60, 60);
+            margin: 0;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: linear-gradient(to right, #141E30, #243B55);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(20, 30, 48, 0.2);
+        }
+        
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        button {
+            background: rgb(0, 60, 60);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        button:hover {
+            background: rgba(0, 60, 60, 0.8);
+            transform: translateY(-2px);
+        }
+        
+        #result {
+            margin-top: 25px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            border-left: 4px solid rgba(0, 60, 60, 0.6);
+            min-height: 20px;
+        }
+        
+        .success {
+            border-left-color: #4CAF50;
+            background: rgba(76, 175, 80, 0.1);
+        }
+        
+        .error {
+            border-left-color: #f44336;
+            background: rgba(244, 67, 54, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Test API Symfony - Workshop Réseau Mesh</h1>
+        <button onclick="testAPI()">Tester la connexion API</button>
+        <div id="result"></div>
+    </div>
+    
+    <script>
+    async function testAPI() {
+        const resultDiv = document.getElementById('result');
+        resultDiv.innerHTML = 'Test en cours...';
+        resultDiv.className = '';
+        
+        try {
+            const response = await fetch('http://localhost:8000/api/test');
+            const data = await response.json();
+            resultDiv.innerHTML = 
+                '<strong>Succès!</strong><br>Réponse API: <pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            resultDiv.className = 'success';
+        } catch (error) {
+            resultDiv.innerHTML = 
+                '<strong>Erreur de connexion:</strong><br>' + error.message + 
+                '<br><br><em>Assure-toi que ton binôme a lancé le serveur Symfony sur localhost:8000</em>';
+            resultDiv.className = 'error';
+        }
+    }
+    </script>
+</body>
+</html>
