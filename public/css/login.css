@@ -7,7 +7,7 @@
 }
 
 body {
-    background: linear-gradient(to bottom left, #ffffff, #005a7e);
+    background: linear-gradient(to bottom left, #ffffff, #9acd32);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -17,8 +17,22 @@ body {
     margin: -20px 0 50px;
 }
 
+/* Navigation entre les pages */
+.page {
+    width: 100%;
+    height: 100vh;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.page.active {
+    display: flex;
+}
+
 .app-title {
-    color: #2c3e50;
+    color: #2d7d32;
     font-size: 2.5rem;
     font-weight: 700;
     margin-bottom: 30px;
@@ -30,6 +44,7 @@ body {
 h1 {
     font-weight: bold;
     margin: 0;
+    color: #2d7d32;
 }
 
 h2 {
@@ -44,29 +59,49 @@ p {
     margin: 20px 0 30px;
 }
 
+.pin-instruction,
+.reset-instruction {
+    font-size: 13px;
+    color: #666;
+    text-align: center;
+    margin: 10px 0 20px 0;
+    line-height: 1.4;
+}
+
 span {
     font-size: 12px;
 }
 
 a {
-    color: #333;
+    color: #2d7d32;
     font-size: 14px;
     text-decoration: none;
     margin: 15px 0;
+    transition: color 0.3s;
 }
 
+a:hover {
+    color: #1b5e20;
+}
+
+/* Boutons principaux */
 button {
     border-radius: 20px;
-    border: 1px solid #003f5e;
-    background-color: #0043fb;
+    border: 1px solid #2d7d32;
+    background-color: #2d7d32;
     color: #ffffff;
     font-size: 12px;
     font-weight: bold;
     padding: 12px 45px;
     letter-spacing: 1px;
     text-transform: uppercase;
-    transition: transform 80ms ease-in;
+    transition: all 80ms ease-in;
     cursor: pointer;
+}
+
+button:hover {
+    background-color: #1b5e20;
+    border-color: #1b5e20;
 }
 
 button:active {
@@ -77,9 +112,29 @@ button:focus {
     outline: none;
 }
 
-button.ghost {
+/* Bouton annuler */
+.cancel-btn {
     background-color: transparent;
-    border-color: #ffffff;
+    color: #2d7d32;
+    border: 1px solid #2d7d32;
+}
+
+.cancel-btn:hover {
+    background-color: #2d7d32;
+    color: white;
+}
+
+/* Conteneurs de boutons */
+.form-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+    justify-content: center;
+}
+
+.form-buttons button {
+    flex: 1;
+    max-width: 120px;
 }
 
 form {
@@ -102,10 +157,17 @@ form {
 input {
     width: 100%;
     padding: 12px 15px;
-    background-color: #eee;
-    border: none;
+    background-color: #f8f8f8;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
     outline: none;
     font-size: 13px;
+    transition: border-color 0.3s;
+}
+
+input:focus {
+    border-color: #2d7d32;
+    background-color: white;
 }
 
 label {
@@ -115,7 +177,7 @@ label {
     transform: translateX(-50%);
     width: 0%;
     height: 2px;
-    background: #ff4b2b;
+    background: #2d7d32;
     transition: 0.3s;
 }
 
@@ -124,8 +186,24 @@ input:focus ~ label {
 }
 
 .forgot {
-    color: #4a0000;
+    color: #2d7d32;
     font-size: 13px;
+    margin: 10px 0 5px 0;
+}
+
+.forgot:hover {
+    color: #1b5e20;
+    text-decoration: underline;
+}
+
+/* Nouveau style pour "Mode Pass Oublié !!" */
+.forgot-mode {
+    color: #9acd32;
+    font-size: 12px;
+    font-weight: 600;
+    margin: 5px 0 15px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .social-container {
@@ -143,11 +221,17 @@ input:focus ~ label {
     width: 40px;
     text-decoration: none;
     color: #333;
+    transition: all 0.3s;
+}
+
+.social-container a:hover {
+    border-color: #2d7d32;
+    color: #2d7d32;
 }
 
 .container {
     background-color: #fff;
-    border-radius: 10px;
+    border-radius: 15px;
     box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
     position: relative;
     overflow: hidden;
@@ -160,6 +244,7 @@ input:focus ~ label {
     position: absolute;
     top: 0;
     height: 100%;
+    width: 100%;
     transition: all 0.6s ease-in-out;
 }
 
@@ -167,4 +252,76 @@ input:focus ~ label {
     left: 0;
     width: 100%;
     z-index: 2;
+}
+
+/* Messages d'erreur et de succès */
+.message {
+    padding: 10px;
+    border-radius: 5px;
+    margin: 10px 0;
+    font-size: 14px;
+    text-align: center;
+}
+
+.error-message {
+    background-color: #ffebee;
+    color: #c62828;
+    border: 1px solid #ef5350;
+}
+
+.success-message {
+    background-color: #e8f5e8;
+    color: #2d7d32;
+    border: 1px solid #4caf50;
+}
+
+/* Loading spinner */
+.loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.loading button {
+    position: relative;
+}
+
+.loading button::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    margin: auto;
+    border: 2px solid transparent;
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container {
+        width: 90%;
+        margin: 20px;
+    }
+    
+    .app-title {
+        font-size: 2rem;
+    }
+    
+    .form-buttons {
+        flex-direction: column;
+    }
+    
+    .form-buttons button {
+        max-width: none;
+    }
 }
