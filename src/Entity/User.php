@@ -17,8 +17,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 180)]
-    private ?string $identifiant = null;
+    #[ORM\Column(length: 255)]
+    private ?string $Nom = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $Prénom = null;
 
     /**
      * @var list<string> The user roles
@@ -38,19 +41,34 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?int $PIN = null;
 
+    #[ORM\Column]
+    private ?bool $isActive = null;
+
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getIdentifiant(): ?string
+    public function getNom(): ?string
     {
-        return $this->identifiant;
+        return $this->Nom;
     }
 
-    public function setIdentifiant(string $identifiant): static
+    public function setNom(string $Nom): static
     {
-        $this->identifiant = $identifiant;
+        $this->Nom = $Nom;
+
+        return $this;
+    }
+
+    public function getPrénom(): ?string
+    {
+        return $this->Prénom;
+    }
+
+    public function setPrénom(string $Prénom): static
+    {
+        $this->Prénom = $Prénom;
 
         return $this;
     }
@@ -139,6 +157,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPIN(int $PIN): static
     {
         $this->PIN = $PIN;
+
+        return $this;
+    }
+
+    public function isActive(): ?bool
+    {
+        return $this->isActive;
+    }
+
+    public function setIsActive(bool $isActive): static
+    {
+        $this->isActive = $isActive;
 
         return $this;
     }
