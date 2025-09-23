@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BROADCOM - Chat Interface</title>
+    <link rel="stylesheet" href="unified-style.css">
+    <meta name="csrf-token" content="demo-csrf-token">>
+</head>
+<body>
+    <!-- Page de Chat -->
+    <div id="chatPage" class="page active">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                BroadCom
+            </div>
+            
+            <div class="user-list" id="userList">
+                <!-- Les utilisateurs seront chargés dynamiquement -->
+                <div class="user-item active">Utilisateur 1</div>
+                <div class="user-item">Utilisateur 2</div>
+                <div class="user-item">Utilisateur 3</div>
+                <div class="user-item">Utilisateur 4</div>
+                <div class="user-item">Utilisateur 5</div>
+                <div class="user-item">Utilisateur 6</div>
+                <div class="user-item">Utilisateur 7</div>
+                <div class="user-item">Utilisateur 8</div>
+                <div class="user-item">Utilisateur 9</div>
+                <div class="user-item">Utilisateur 10</div>
+                <div class="user-item">Utilisateur 11</div>
+                <div class="user-item">Utilisateur 12</div>
+                <div class="user-item">Utilisateur 13</div>
+            </div>
+            
+            <div class="alerts-section" id="alertsBtn">
+                ALERTES
+            </div>
+        </div>
+
+        <div class="chat-container">
+            <div class="chat-header">
+                <div class="chat-title" id="chatTitle">Utilisateur 1</div>
+                <div class="header-actions">
+                    <span id="currentUser">Utilisateur</span>
+                    <button class="quit-btn" id="quitBtnChat">Quitter</button>
+                </div>
+            </div>
+            
+            <div class="messages-container" id="messagesContainer">
+                <!-- Messages vides au début - seront chargés dynamiquement -->
+            </div>
+            
+            <div class="message-input-container">
+                <div class="message-input-wrapper">
+                    <input type="text" class="message-input" id="messageInput" placeholder="Tapez votre message...">
+                    <button class="send-btn" id="sendBtn">Envoyer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page d'Alertes -->
+    <div id="alertPage" class="page">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                BroadCom
+            </div>
+            
+            <div class="user-list">
+                <div class="user-item active">📢 ALERTES GROUPE</div>
+            </div>
+            
+            <div class="alerts-section active">
+                ALERTES
+            </div>
+        </div>
+
+        <div class="chat-container">
+            <div class="chat-header">
+                <div class="chat-title">📢 ALERTES - Message de Groupe</div>
+                <div class="header-actions">
+                    <button class="quit-btn" id="quitBtnAlert">Quitter</button>
+                </div>
+            </div>
+            
+            <div class="messages-container" id="alertMessagesContainer">
+                <div class="alert-message urgent">
+                    <div class="alert-header">
+                        <span class="alert-badge urgent">URGENT</span>
+                        <span class="alert-time">14:30</span>
+                    </div>
+                    <div class="alert-content">Maintenance serveur prévue à 16h00. Veuillez sauvegarder vos données.</div>
+                    <div class="alert-sender">- Admin</div>
+                </div>
+                
+                <div class="alert-message important">
+                    <div class="alert-header">
+                        <span class="alert-badge important">IMPORTANT</span>
+                        <span class="alert-time">13:15</span>
+                    </div>
+                    <div class="alert-content">Nouvelle politique de sécurité en vigueur dès demain.</div>
+                    <div class="alert-sender">- Direction</div>
+                </div>
+                
+                <div class="alert-message information">
+                    <div class="alert-header">
+                        <span class="alert-badge information">INFORMATION</span>
+                        <span class="alert-time">12:00</span>
+                    </div>
+                    <div class="alert-content">Pause déjeuner prolongée aujourd'hui jusqu'à 14h.</div>
+                    <div class="alert-sender">- RH</div>
+                </div>
+            </div>
+            
+            <div class="alert-input-container">
+                <div class="alert-priority-selector">
+                    <h4>Sélectionnez le niveau d'alerte :</h4>
+                    <div class="priority-buttons">
+                        <button class="priority-btn urgent" data-priority="urgent">URGENT</button>
+                        <button class="priority-btn important" data-priority="important">IMPORTANT</button>
+                        <button class="priority-btn information active" data-priority="information">INFORMATION</button>
+                    </div>
+                </div>
+                
+                <div class="message-input-wrapper">
+                    <textarea class="alert-input" id="alertInput" placeholder="Tapez votre message d'alerte..." rows="3"></textarea>
+                    <button class="send-alert-btn" id="sendAlertBtn">ENVOYER ALERTE</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Variables JavaScript pour le backend -->
+    <script>
+        window.chatConfig = {
+            apiBaseUrl: '/api',
+            currentUserId: 1, // À remplacer par la vraie valeur du backend
+            csrfToken: 'demo-token', // À remplacer par le vrai token CSRF
+            socketUrl: 'ws://localhost:3000'
+        };
+    </script>
+    <script src="unified-script.js"></script>
+</body>
+</html>
