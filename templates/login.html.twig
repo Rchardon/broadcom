@@ -4,41 +4,88 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BROADCOM - Sign in || Sign up</title>
-    <!-- font awesome icons -->
+    <title>BROADCOM - Connexion</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <!-- css stylesheet -->
-    <link rel="stylesheet" href="{{ asset('css/login.css') }}">
+    <link rel="stylesheet" href="login.css">
 </head>
 <body>
-    <div class="app-title">BROADCOM</div>
-    
-    <div class="container" id="container">
-        <div class="form-container sign-in-container">
-            <form action="#">
-                <h1>Se connecter</h1>
-                <div class="infield">
-                    <input type="text" placeholder="nom.prénom" name="username"/>
-                    <label></label>
-                </div>
-                <div class="infield">
-                    <input type="password" placeholder="Password" />
-                    <label></label>
-                </div>
-                <a href="#" class="forgot">Mot de passe oublié ?</a>
-                <button>Se connecter</button>
-            </form>
+    <!-- Page de Connexion -->
+    <div id="loginPage" class="page active">
+        <div class="app-title">BROADCOM</div>
+        
+        <div class="container">
+            <div class="form-container sign-in-container">
+                <form id="loginForm">
+                    <h1>Se connecter</h1>
+                    <div class="infield">
+                        <input type="text" placeholder="nom.prénom" name="username" id="username" required/>
+                        <label></label>
+                    </div>
+                    <div class="infield">
+                        <input type="password" placeholder="Mot de passe" name="password" id="password" required/>
+                        <label></label>
+                    </div>
+                    <a href="#" class="forgot" id="forgotPasswordLink">Mot de passe oublié ?</a>
+                    
+                    <button type="submit">Se connecter</button>
+                </form>
+            </div>
         </div>
     </div>
 
-    <!-- js code -->
-    <script>
-        // Code JavaScript simplifié car plus besoin de l'animation overlay
-        document.querySelector('form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            // Ici vous pouvez ajouter la logique de connexion
-            console.log('Connexion en cours...');
-        });
-    </script>
+    <!-- Page Code PIN -->
+    <div id="pinPage" class="page">
+        <div class="app-title">BROADCOM</div>
+        
+        <div class="container">
+            <div class="form-container">
+                <form id="pinForm">
+                    <h1>Code PIN Personnel</h1>
+                    <p class="pin-instruction">Saisissez votre code PIN pour réinitialiser votre mot de passe</p>
+                    
+                    <div class="infield">
+                        <input type="password" placeholder="Code PIN" name="pin" id="pinCode" required maxlength="6"/>
+                        <label></label>
+                    </div>
+                    
+                    <div class="form-buttons">
+                        <button type="button" class="cancel-btn" id="cancelPin">Annuler</button>
+                        <button type="submit">Valider PIN</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page Nouveau Mot de Passe -->
+    <div id="resetPage" class="page">
+        <div class="app-title">BROADCOM</div>
+        
+        <div class="container">
+            <div class="form-container">
+                <form id="resetForm">
+                    <h1>Nouveau Mot de Passe</h1>
+                    <p class="reset-instruction">Créez votre nouveau mot de passe</p>
+                    
+                    <div class="infield">
+                        <input type="password" placeholder="Nouveau mot de passe" name="newPassword" id="newPassword" required/>
+                        <label></label>
+                    </div>
+                    
+                    <div class="infield">
+                        <input type="password" placeholder="Confirmer mot de passe" name="confirmPassword" id="confirmPassword" required/>
+                        <label></label>
+                    </div>
+                    
+                    <div class="form-buttons">
+                        <button type="button" class="cancel-btn" id="cancelReset">Annuler</button>
+                        <button type="submit">Confirmer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="login.js"></script>
 </body>
 </html>
