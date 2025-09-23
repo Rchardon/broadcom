@@ -8,7 +8,6 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ORM\Table(name: '`user`')]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_IDENTIFIANT', fields: ['identifiant'])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -17,11 +16,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $Nom = null;
-
-    #[ORM\Column(length: 255)]
-    private ?string $Prénom = null;
+    #[ORM\Column(length: 180)]
+    private ?string $identifiant = null;
 
     /**
      * @var list<string> The user roles
@@ -35,11 +31,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
-    #[ORM\Column]
-    private ?int $NoApp = null;
+    #[ORM\Column(length: 255)]
+    private ?string $Nom = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $Prénom = null;
 
     #[ORM\Column]
-    private ?int $PIN = null;
+    private ?int $noApp = null;
+
+    #[ORM\Column]
+    private ?int $pin = null;
 
     #[ORM\Column]
     private ?bool $isActive = null;
@@ -49,26 +51,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->id;
     }
 
-    public function getNom(): ?string
+    public function getIdentifiant(): ?string
     {
-        return $this->Nom;
+        return $this->identifiant;
     }
 
-    public function setNom(string $Nom): static
+    public function setIdentifiant(string $identifiant): static
     {
-        $this->Nom = $Nom;
-
-        return $this;
-    }
-
-    public function getPrénom(): ?string
-    {
-        return $this->Prénom;
-    }
-
-    public function setPrénom(string $Prénom): static
-    {
-        $this->Prénom = $Prénom;
+        $this->identifiant = $identifiant;
 
         return $this;
     }
@@ -137,26 +127,50 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // @deprecated, to be removed when upgrading to Symfony 8
     }
 
-    public function getNoApp(): ?int
+    public function getNom(): ?string
     {
-        return $this->NoApp;
+        return $this->Nom;
     }
 
-    public function setNoApp(int $NoApp): static
+    public function setNom(string $Nom): static
     {
-        $this->NoApp = $NoApp;
+        $this->Nom = $Nom;
 
         return $this;
     }
 
-    public function getPIN(): ?int
+    public function getPrénom(): ?string
     {
-        return $this->PIN;
+        return $this->Prénom;
     }
 
-    public function setPIN(int $PIN): static
+    public function setPrénom(string $Prénom): static
     {
-        $this->PIN = $PIN;
+        $this->Prénom = $Prénom;
+
+        return $this;
+    }
+
+    public function getNoApp(): ?int
+    {
+        return $this->noApp;
+    }
+
+    public function setNoApp(int $noApp): static
+    {
+        $this->noApp = $noApp;
+
+        return $this;
+    }
+
+    public function getPin(): ?int
+    {
+        return $this->pin;
+    }
+
+    public function setPin(int $pin): static
+    {
+        $this->pin = $pin;
 
         return $this;
     }
