@@ -217,18 +217,54 @@ function displayUsers(users) {
 }
 
 async function selectUser(user) {
+    // Mettre à jour l'interface
     document.querySelectorAll('#chatPage .user-item').forEach(item => {
         item.classList.remove('active');
     });
-    document.querySelector(`[data-user-id="${user.id}"]`).classList.add('active');
+    
+    // Trouver l'élément cliqué et l'activer
+    const clickedItem = Array.from(document.querySelectorAll('#chatPage .user-item')).find(item => 
+        item.textContent.trim() === user.name
+    );
+    if (clickedItem) {
+        clickedItem.classList.add('active');
+    }
     
     document.getElementById('chatTitle').textContent = user.name;
-    currentChatId = user.chat_id;
+    currentChatId = user.chat_id || user.name; // Utiliser le nom comme ID temporaire
     
+    // Activer l'input de message
     document.getElementById('messageInput').disabled = false;
     document.getElementById('sendBtn').disabled = false;
     
-    await loadMessages(user.chat_id);
+    // Vider la conversation (chaque utilisateur commence avec une conversation vide)
+    clearMessages();
+    
+    // Dans la vraie implémentation, charger les messages depuis la base de données
+    // await loadMessages(user.chat_id);
+}
+
+// Nouvelle fonction pour vider les messages
+function clearMessages() {
+    const container = document.getElementById('messagesContainer');
+    container.innerHTML = '<div class="empty-conversation">Aucun message pour l\'instant. Commencez la conversation !</div>';
+}
+
+// Modifier la fonction d'affichage des messages pour gérer les conversations vides
+function displayMessages(messages) {
+    const container = document.getElementById('messagesContainer');
+    
+    if (!messages || messages.length === 0) {
+        container.innerHTML = '<div class="empty-conversation">Aucun message pour l\'instant. Commencez la conversation !</div>';
+        return;
+    }
+    
+    container.innerHTML = '';
+    messages.forEach(message => {
+        displayMessage(message, false);
+    });
+    
+    scrollToBottom('messagesContainer');
 }
 
 async function loadMessages(chatId) {
@@ -259,13 +295,20 @@ function displayMessages(messages) {
 
 function displayMessage(message, animate = true) {
     const container = document.getElementById('messagesContainer');
+    
+    // Supprimer le message "conversation vide" s'il existe
+    const emptyMessage = container.querySelector('.empty-conversation');
+    if (emptyMessage) {
+        emptyMessage.remove();
+    }
+    
     const messageDiv = document.createElement('div');
     
     const isSent = message.sender_id === config.currentUserId;
     messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
     messageDiv.innerHTML = `
         <div class="message-content">${escapeHtml(message.content)}</div>
-        <div class="message-time">${formatTime(message.created_at)}</div>
+        <div class="message-time">${formatTime(message.created_at || new Date().toISOString())}</div>
     `;
     
     if (animate) {
