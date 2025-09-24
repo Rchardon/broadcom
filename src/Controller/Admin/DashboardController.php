@@ -6,15 +6,27 @@ use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityNotFoundException;
 use Symfony\Component\HttpFoundation\Response;
 use App\Entity\User;
 
 #[AdminDashboard(routePath: '/admin', routeName: 'admin')]
 class DashboardController extends AbstractDashboardController
 {
-    public function index(): Response
+    private $doctrine;
+
+    public function __construct(ManagerRegistry $doctrine)
     {
-        return $this->render('Admin/dashboard.html.twig');
+        $this->doctrine = $doctrine;
+    }
+
+    public function index(): Response
+    {   
+        $Users=$this->doctrine->getManager()->getRepository(User::class)->findAll();
+        return $this->render('Admin/dashboard.html.twig', [
+        'users' => $Users,
+    ]);
     }
 
     public function configureDashboard(): Dashboard
