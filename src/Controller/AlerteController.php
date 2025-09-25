@@ -2,29 +2,41 @@
 
 namespace App\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Form\AlerteType;
 use App\Entity\Alerte;
 
 final class AlerteController extends AbstractController
 {
-    #[Route('/alerte/new', name: 'app_new_alerte')]
-    public function newAlerte(Request $request)
+    #[Route('/alertes', name: 'app_alertes')]
+    public function index(Request $request, ManagerRegistry $doctrine, EntityManagerInterface $entityManager): Response
     {
-        // just set up a fresh $task object (remove the example data)
-        $task = new Task();
+        $user = $this->getUser();
+        if(in_array('ROLE_ADMIN', $user->getRoles())){
+            return $this->redirectToRoute('admin');
+        }
 
-        $form = $this->createForm(TaskType::class, $task);
+        $alertes = $doctrine->getRepository(Alerte::class)->findAll();
+        $alerte=new Alerte();
+        $form = $this->createForm(AlerteType::class, $alerte);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $task = $form->getData();
+            // $form->getData() holds the submitted values// but, the original `$task` variable has also been updated$task = $form->getData();
+            
+            $alerte = $form->getData();
+            $entityManager->persist($alerte);
+            $entityManager->flush();
+        }
 
-            $alerte=new Alerte();
-
-            return $this->redirectToRoute('task_success');
-        }        
+        return $this->render('alertes.html.twig', [
+            'alertes' => $alertes,
+            'form' => $form,
+        ]);
     }
 }

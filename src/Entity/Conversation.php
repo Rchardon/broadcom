@@ -25,7 +25,7 @@ class Conversation
     #[ORM\JoinColumn(nullable: false)]
     private ?User $utilisateur1 = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(inversedBy: 'conversations2')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $utilisateur2 = null;
 

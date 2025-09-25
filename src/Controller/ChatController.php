@@ -2,18 +2,22 @@
 
 namespace App\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Security;
+use App\Form\AlerteType;
+use App\Form\ChatType;
 use App\Entity\Alerte;
+use App\Entity\Conversation;
 
 final class ChatController extends AbstractController
 {
     #[Route('/chat', name: 'app_chat')]
-    public function index(ManagerRegistry $doctrine): Response
+    public function index(ManagerRegistry $doctrine, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
         if(in_array('ROLE_ADMIN', $user->getRoles())){
@@ -30,18 +34,56 @@ final class ChatController extends AbstractController
             array_push($conversations, $conversation);
         }
 
-        $alertes = $doctrine->getRepository(Alerte::class)->findAll();
-
         return $this->render('chat-unified.html.twig', [
-            'controller_name' => 'ChatController',
             'current_user' => $user,
             'conversations' => $conversations,
-            'alertes' => $alertes,
         ]);
     }
 
-    #[Route('/chat/new', name: 'app_new_chat')]
-    public function newChat(Request $request) {
+    #[Route('/chat/{id}', name: 'app_conv_chat')]
+    public function convChat(Request $request, Conversation $idConv) {
+        $user = $this->getUser();
+        if(in_array('ROLE_ADMIN', $user->getRoles())){
+            return $this->redirectToRoute('admin');
+        }
 
+        $conversations1=$user->getConversations1();
+        $conversations2=$user->getConversations2();
+        $conversations=[];
+        foreach($conversations1 as $conversation) {
+            array_push($conversations, $conversation);
+        }
+        foreach($conversations2 as $conversation) {
+            array_push($conversations, $conversation);
+        }
+
+        $vraiConvs = []; 
+        foreach($conversations as $conv) {
+            if ($conv->getId() == $idConv->getId()) {
+                array_push($vraiConvs, $conv);
+            }
+        }
+
+        $message=new Message();
+        $form = $this->createForm(ChatType::class, $alerte);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            // $form->getData() holds the submitted values// but, the original `$task` variable has also been updated$task = $form->getData();
+            
+            $alerte = $form->getData();
+            $entityManager->persist($alerte);
+            $entityManager->flush();
+        }
+
+        return $this->render('alertes.html.twig', [
+            'alertes' => $alertes,
+            'form' => $form,
+        ]);
+
+        return $this->render('chat-unified.html.twig', [
+            'current_user' => $user,
+            'conversations' => $vraiConvs,
+        ]);
     }
 }
