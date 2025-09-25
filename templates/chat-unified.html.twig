@@ -38,7 +38,11 @@
             </div>
             
             <div class="messages-container" id="messagesContainer">
-                <!-- Messages vides au début - seront chargés dynamiquement -->
+                {% for conversation in conversations %}
+                    {% for message in conversation.getMessages() %}
+                        <div>{{ message.texte }}</div>
+                    {% endfor %}
+                {% endfor %}
             </div>
             
             <div class="message-input-container">
