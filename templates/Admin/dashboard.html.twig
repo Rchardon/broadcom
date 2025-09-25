@@ -28,9 +28,9 @@
         <div class="main-container">
             <div class="header">
                 <h1>Utilisateurs</h1>
-                <button class="logout-btn" id="logoutBtn">
-                    <i class="fas fa-sign-out-alt"></i>
-                </button>
+                <form action="{{path('app_logout')}}">
+                    <button class="logout-btn" id="logoutBtn" type="submit"><i class="fas fa-sign-out-alt"></i></button>
+                </form>
             </div>
             
             <div class="content">
