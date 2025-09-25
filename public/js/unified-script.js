@@ -564,10 +564,8 @@ function displayNewAlert(alertData) {
     alertDiv.innerHTML = `
         <div class="alert-header">
             <span class="alert-badge ${alertData.priority}">${alertData.priority.toUpperCase()}</span>
-            <span class="alert-time">${formatTime(alertData.timestamp)}</span>
         </div>
         <div class="alert-content">${escapeHtml(alertData.content)}</div>
-        <div class="alert-sender">- ${alertData.sender}</div>
     `;
     
     alertDiv.style.opacity = '0';
