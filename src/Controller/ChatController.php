@@ -17,8 +17,20 @@ final class ChatController extends AbstractController
             return $this->redirectToRoute('admin');
         }
 
+        $conversations1=$user->getConversations1();
+        $conversations2=$user->getConversations2();
+        $conversations=[];
+        foreach($conversations1 as $conversation) {
+            array_push($conversations, $conversation);
+        }
+        foreach($conversations2 as $conversation) {
+            array_push($conversations, $conversation);
+        }
+
         return $this->render('chat-unified.html.twig', [
             'controller_name' => 'ChatController',
+            'current_user' => $user,
+            'conversations' => $conversations,
         ]);
     }
 }

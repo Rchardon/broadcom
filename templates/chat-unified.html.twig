@@ -16,20 +16,9 @@
             </div>
             
             <div class="user-list" id="userList">
-                <!-- Les utilisateurs seront chargés dynamiquement -->
-                <div class="user-item active">Utilisateur 1</div>
-                <div class="user-item">Utilisateur 2</div>
-                <div class="user-item">Utilisateur 3</div>
-                <div class="user-item">Utilisateur 4</div>
-                <div class="user-item">Utilisateur 5</div>
-                <div class="user-item">Utilisateur 6</div>
-                <div class="user-item">Utilisateur 7</div>
-                <div class="user-item">Utilisateur 8</div>
-                <div class="user-item">Utilisateur 9</div>
-                <div class="user-item">Utilisateur 10</div>
-                <div class="user-item">Utilisateur 11</div>
-                <div class="user-item">Utilisateur 12</div>
-                <div class="user-item">Utilisateur 13</div>
+                {% for conversation in conversations %}
+                    <div class="user-item">{% if conversation.utilisateur1.id == current_user.id %}{{ conversation.utilisateur2.Prénom }} {{conversation.utilisateur2.Nom }}{% else %}{{ conversation.utilisateur1.Prénom }} {{conversation.utilisateur1.Nom }} {% endif %}</div>
+                {% endfor %}
             </div>
             
             <div class="alerts-section" id="alertsBtn">
@@ -41,8 +30,8 @@
             <div class="chat-header">
                 <div class="chat-title" id="chatTitle">Utilisateur 1</div>
                 <div class="header-actions">
-                    <span id="currentUser">Utilisateur</span>
-                    <button class="quit-btn" id="quitBtnChat">Quitter</button>
+                    <span id="currentUser">{{ current_user.Identifiant }}</span>
+                    <button class="quit-btn" id="quitBtnChat" type="submit" href="{{path('app_logout')}}">Se déconnecter</button>
                 </div>
             </div>
             
