@@ -49,12 +49,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?bool $isActive = null;
 
     /**
-     * @var Collection<int, Conversation>
-     */
-    #[ORM\ManyToMany(targetEntity: Conversation::class, mappedBy: 'Utilisateur1')]
-    private Collection $conversations;
-
-    /**
      * @var Collection<int, Message>
      */
     #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'Envoyeur', orphanRemoval: true)]
@@ -66,9 +60,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Conversation::class, mappedBy: 'utilisateur1', orphanRemoval: true)]
     private Collection $conversations1;
 
+    /**
+     * @var Collection<int, Conversation>
+     */
+    #[ORM\OneToMany(targetEntity: Conversation::class, mappedBy: 'utilisateur2', orphanRemoval: true)]
+    private Collection $conversations2;
+
     public function __construct()
     {
-        $this->conversations = new ArrayCollection();
+        $this->conversations2 = new ArrayCollection();
         $this->messages = new ArrayCollection();
         $this->conversations1 = new ArrayCollection();
     }
@@ -215,33 +215,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return Collection<int, Conversation>
-     */
-    public function getConversations(): Collection
-    {
-        return $this->conversations;
-    }
-
-    public function addConversation(Conversation $conversation): static
-    {
-        if (!$this->conversations->contains($conversation)) {
-            $this->conversations->add($conversation);
-            $conversation->addUtilisateur1($this);
-        }
-
-        return $this;
-    }
-
-    public function removeConversation(Conversation $conversation): static
-    {
-        if ($this->conversations->removeElement($conversation)) {
-            $conversation->removeUtilisateur1($this);
-        }
-
-        return $this;
-    }
-
-    /**
      * @return Collection<int, Message>
      */
     public function getMessages(): Collection
@@ -295,6 +268,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($conversations1->getUtilisateur1() === $this) {
                 $conversations1->setUtilisateur1(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Conversation>
+     */
+    public function getConversations2(): Collection
+    {
+        return $this->conversations2;
+    }
+
+    public function addConversations2(Conversation $conversations2): static
+    {
+        if (!$this->conversations2->contains($conversations2)) {
+            $this->conversations2->add($conversations2);
+            $conversations2->setUtilisateur2($this);
+        }
+
+        return $this;
+    }
+
+    public function removeConversations2(Conversation $conversations2): static
+    {
+        if ($this->conversations2->removeElement($conversations2)) {
+            // set the owning side to null (unless already changed)
+            if ($conversations2->getUtilisateur2() === $this) {
+                $conversations2->setUtilisateur2(null);
             }
         }
 

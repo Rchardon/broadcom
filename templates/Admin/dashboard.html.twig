@@ -7,7 +7,6 @@
     <title>BROADCOM - Administration</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="{{asset('css/admin.css')}}">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <body>
     <!-- Page Gestion Utilisateurs -->
@@ -48,14 +47,28 @@
                                 <th>Nom</th>
                                 <th>Prénom</th>
                                 <th>Appartement</th>
-                                <th>Immeuble</th>
-                                <th>Dernière connexion</th>
-                                <th>Actif/Désactif</th>
+                                <th>Actif ?</th>
+                                <th>PIN</th>
                                 <th>Modifier</th>
                             </tr>
                         </thead>
                         <tbody id="usersTableBody">
-                            <!-- Les utilisateurs seront chargés dynamiquement -->
+                            {% for user in users %}
+                                <tr name="elements" id="{{ user.id}}">
+                                    <td>{{ user.id }}</td>
+                                    <td>{{ user.nom }}</td>
+                                    <td>{{ user.prénom }}</td>
+                                    <td>{{ user.noApp }}</td>
+                                    <td>{{ user.isActive == 1 ? 'Oui' : 'Non' }}</td>
+                                    <td>{{ user.pin }}</td>
+
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="10">Rien a afficher</td>
+                                </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
@@ -194,14 +207,6 @@
     </div>
 
     <!-- Configuration JavaScript pour le backend -->
-    <script>
-        window.adminConfig = {
-            apiBaseUrl: '{{ url('api/admin') }}',
-            currentAdminId: {{ app.user ? app.user.id : 'null' }},
-            csrfToken: '{{ csrf_token() }}',
-            socketUrl: '{{ app.environment.SOCKET_URL|default("ws://localhost:3000") }}'
-        };
-    </script>
     <script src="admin.js"></script>
 </body>
 </html>
