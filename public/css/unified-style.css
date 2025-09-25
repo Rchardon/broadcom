@@ -7,11 +7,8 @@
 }
 
 body {
-    font-family: 'Montserrat', sans-serif;
     height: 100vh;
-    display: flex;
-    background-color: #f5f5f5;
-    overflow: hidden;
+    background-color: #f5f5f5;  
 }
 
 /* Navigation entre les pages */
@@ -28,7 +25,7 @@ body {
 
 /* Sidebar commune */
 .sidebar {
-    width: 250px;
+    width: 200px;
     background-color: #2d7d32;
     color: white;
     display: flex;
@@ -71,7 +68,7 @@ body {
 }
 
 .user-item::before {
-    content: "▲";
+    content: "➤";
     margin-right: 8px;
     font-size: 0.7rem;
     opacity: 0.7;
@@ -111,7 +108,7 @@ body {
     flex: 1;
     display: flex;
     flex-direction: column;
-    background: linear-gradient(to top, #9acd32, #ffffff);
+    background-color: white;
     min-height: 100vh;
 }
 
@@ -157,7 +154,7 @@ body {
     background-color: #b71c1c;
 }
 
-/* Messages Area - Chat normal */
+
 .messages-container {
     flex: 1;
     padding: 20px;
@@ -280,22 +277,26 @@ body {
 
 /* Message Input - Chat normal */
 .message-input-container {
-    padding: 20px;
     background-color: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(10px);
+    border-radius: 20px;
+    border-color: #1b5e20;
+    border: 1px solid #1b5e20;
+    padding: 10px 20px; /* Augmenté le padding horizontal de 15px à 50px */
+    margin: 20px 20px; /* Ajouté une marge externe pour plus d'espacement */
 }
 
 .message-input-wrapper {
     display: flex;
     gap: 10px;
-    max-width: 800px;
+    max-width: 600px; /* Réduit de 800px à 600px pour plus d'espace sur les côtés */
     margin: 0 auto;
     align-items: flex-end;
 }
 
 .message-input {
     flex: 1;
-    padding: 12px 18px;
+    padding: 12px 10px;
     border: 2px solid #e0e0e0;
     border-radius: 25px;
     outline: none;
