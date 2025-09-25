@@ -48,7 +48,6 @@
                                 <th>Appartement</th>
                                 <th>Actif ?</th>
                                 <th>PIN</th>
-                                <th>Modifier</th>
                             </tr>
                         </thead>
                         <tbody id="usersTableBody">
@@ -60,8 +59,6 @@
                                     <td>{{ user.noApp }}</td>
                                     <td>{{ user.isActive == 1 ? 'Oui' : 'Non' }}</td>
                                     <td>{{ user.pin }}</td>
-
-                                    </td>
                                 </tr>
                             {% else %}
                                 <tr>
