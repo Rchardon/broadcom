@@ -2,8 +2,14 @@
 // VARIABLES GLOBALES
 // ============================================
 
-// Configuration depuis le backend
-const config = window.chatConfig;
+// Configuration depuis le backend (avec valeurs par défaut)
+const config = window.chatConfig || {
+    currentUserId: 'user123', // Valeur par défaut pour test
+    apiBaseUrl: '/api',
+    socketUrl: null,
+    csrfToken: 'default-token'
+};
+
 let currentChatId = null;
 let socket = null;
 let selectedPriority = 'information';
@@ -14,6 +20,7 @@ let currentPage = 'chat'; // 'chat' ou 'alert'
 // ============================================
 
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, initializing app...');
     initializeApp();
     connectWebSocket();
     loadUsers();
@@ -24,9 +31,12 @@ function initializeApp() {
     setupAjaxHeaders();
     
     if (!config.currentUserId) {
-        window.location.href = 'login.html';
+        console.warn('Pas d\'utilisateur connecté, redirection...');
+        // window.location.href = 'login.html';
         return;
     }
+    
+    console.log('App initialisée avec l\'utilisateur:', config.currentUserId);
 }
 
 function setupAjaxHeaders() {
@@ -66,6 +76,8 @@ function connectWebSocket() {
         } catch (error) {
             console.error('Erreur WebSocket:', error);
         }
+    } else {
+        console.log('Pas de WebSocket configuré');
     }
 }
 
@@ -93,18 +105,25 @@ function handleWebSocketMessage(data) {
 // ============================================
 
 function showPage(pageName) {
+    console.log('Changement de page vers:', pageName);
+    
     // Cacher toutes les pages
     document.querySelectorAll('.page').forEach(page => {
         page.classList.remove('active');
     });
     
     // Afficher la page demandée
-    document.getElementById(pageName + 'Page').classList.add('active');
-    currentPage = pageName;
-    
-    // Actions spécifiques selon la page
-    if (pageName === 'alert') {
-        loadExistingAlerts();
+    const targetPage = document.getElementById(pageName + 'Page');
+    if (targetPage) {
+        targetPage.classList.add('active');
+        currentPage = pageName;
+        
+        // Actions spécifiques selon la page
+        if (pageName === 'alert') {
+            loadExistingAlerts();
+        }
+    } else {
+        console.error('Page non trouvée:', pageName + 'Page');
     }
 }
 
@@ -113,67 +132,119 @@ function showPage(pageName) {
 // ============================================
 
 function setupEventListeners() {
+    console.log('Configuration des event listeners...');
+    
     // ========== NAVIGATION ==========
     
     // Bouton ALERTES
-    document.getElementById('alertsBtn').addEventListener('click', function() {
-        showPage('alert');
-    });
+    const alertsBtn = document.getElementById('alertsBtn');
+    if (alertsBtn) {
+        alertsBtn.addEventListener('click', function() {
+            console.log('Bouton alertes cliqué');
+            showPage('alert');
+        });
+        console.log('Event listener ajouté pour alertsBtn');
+    } else {
+        console.error('Bouton alertsBtn non trouvé');
+    }
     
     // Bouton Quitter - Page Chat
-    document.getElementById('quitBtnChat').addEventListener('click', function() {
-        if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
-            window.location.href = 'login.html';
-        }
-    });
+    const quitBtnChat = document.getElementById('quitBtnChat');
+    if (quitBtnChat) {
+        quitBtnChat.addEventListener('click', function() {
+            console.log('Bouton quitter chat cliqué');
+            if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+                // window.location.href = 'login.html';
+                console.log('Déconnexion confirmée');
+            }
+        });
+        console.log('Event listener ajouté pour quitBtnChat');
+    } else {
+        console.error('Bouton quitBtnChat non trouvé');
+    }
     
     // Bouton Quitter - Page Alert
-    document.getElementById('quitBtnAlert').addEventListener('click', function() {
-        showPage('chat');
-    });
+    const quitBtnAlert = document.getElementById('quitBtnAlert');
+    if (quitBtnAlert) {
+        quitBtnAlert.addEventListener('click', function() {
+            console.log('Bouton quitter alert cliqué');
+            showPage('chat');
+        });
+        console.log('Event listener ajouté pour quitBtnAlert');
+    } else {
+        console.error('Bouton quitBtnAlert non trouvé');
+    }
 
     // ========== CHAT NORMAL ==========
     
     // Envoi de message chat
-    document.getElementById('sendBtn').addEventListener('click', sendMessage);
-    
-    document.getElementById('messageInput').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
+    const sendBtn = document.getElementById('sendBtn');
+    if (sendBtn) {
+        sendBtn.addEventListener('click', function() {
+            console.log('Bouton envoyer cliqué');
             sendMessage();
-        }
-    });
-    
-    // Sélection d'utilisateurs
-    document.querySelectorAll('#chatPage .user-item').forEach(item => {
-        item.addEventListener('click', function() {
-            if (this.textContent.includes('📢')) return; // Ignorer l'item alertes
-            
-            selectUser({
-                id: Math.random(), // Simulation
-                name: this.textContent,
-                chat_id: Math.random()
-            });
         });
-    });
+        console.log('Event listener ajouté pour sendBtn');
+    } else {
+        console.error('Bouton sendBtn non trouvé');
+    }
+    
+    const messageInput = document.getElementById('messageInput');
+    if (messageInput) {
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                console.log('Envoi message via Enter');
+                sendMessage();
+            }
+        });
+        console.log('Event listener ajouté pour messageInput');
+    } else {
+        console.error('Input messageInput non trouvé');
+    }
 
     // ========== ALERTES ==========
     
     // Gestion des boutons de priorité
-    document.querySelectorAll('.priority-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            selectPriority(this.dataset.priority);
+    const priorityBtns = document.querySelectorAll('.priority-btn');
+    if (priorityBtns.length > 0) {
+        priorityBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                console.log('Bouton priorité cliqué:', this.dataset.priority);
+                selectPriority(this.dataset.priority);
+            });
         });
-    });
+        console.log(`${priorityBtns.length} boutons de priorité configurés`);
+    } else {
+        console.error('Aucun bouton de priorité trouvé');
+    }
 
     // Envoi d'alerte
-    document.getElementById('sendAlertBtn').addEventListener('click', sendAlert);
-    
-    document.getElementById('alertInput').addEventListener('keydown', function(e) {
-        if (e.ctrlKey && e.key === 'Enter') {
+    const sendAlertBtn = document.getElementById('sendAlertBtn');
+    if (sendAlertBtn) {
+        sendAlertBtn.addEventListener('click', function() {
+            console.log('Bouton envoyer alerte cliqué');
             sendAlert();
-        }
-    });
+        });
+        console.log('Event listener ajouté pour sendAlertBtn');
+    } else {
+        console.error('Bouton sendAlertBtn non trouvé');
+    }
+    
+    const alertInput = document.getElementById('alertInput');
+    if (alertInput) {
+        alertInput.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                console.log('Envoi alerte via Ctrl+Enter');
+                sendAlert();
+            }
+        });
+        console.log('Event listener ajouté pour alertInput');
+    } else {
+        console.error('Input alertInput non trouvé');
+    }
+    
+    console.log('Configuration des event listeners terminée');
 }
 
 // ============================================
@@ -181,7 +252,20 @@ function setupEventListeners() {
 // ============================================
 
 async function loadUsers() {
+    console.log('Chargement des utilisateurs...');
+    
     try {
+        // Simulation d'utilisateurs pour test
+        const users = [
+            { id: 1, name: 'Jean Dupont', online: true, unread_count: 2, chat_id: 'chat1' },
+            { id: 2, name: 'Marie Martin', online: false, unread_count: 0, chat_id: 'chat2' },
+            { id: 3, name: 'Pierre Durand', online: true, unread_count: 1, chat_id: 'chat3' },
+            { id: 4, name: 'Sophie Bernard', online: true, unread_count: 0, chat_id: 'chat4' }
+        ];
+        
+        displayUsers(users);
+        
+        /* Version avec API réelle :
         const response = await fetch(`${config.apiBaseUrl}/users`, {
             headers: window.defaultHeaders
         });
@@ -192,13 +276,25 @@ async function loadUsers() {
         } else {
             console.error('Erreur lors du chargement des utilisateurs');
         }
+        */
     } catch (error) {
         console.error('Erreur réseau:', error);
+        // Afficher des utilisateurs par défaut en cas d'erreur
+        displayUsers([
+            { id: 1, name: 'Utilisateur Test', online: true, unread_count: 0, chat_id: 'test' }
+        ]);
     }
 }
 
 function displayUsers(users) {
+    console.log('Affichage des utilisateurs:', users);
+    
     const userList = document.querySelector('#chatPage .user-list');
+    if (!userList) {
+        console.error('Liste utilisateurs non trouvée');
+        return;
+    }
+    
     userList.innerHTML = '';
     
     users.forEach(user => {
@@ -211,60 +307,59 @@ function displayUsers(users) {
             ${user.unread_count > 0 ? `<span class="unread-badge">${user.unread_count}</span>` : ''}
         `;
         
-        userItem.addEventListener('click', () => selectUser(user));
+        // ✅ Event listener ajouté directement lors de la création
+        userItem.addEventListener('click', function() {
+            console.log('Utilisateur sélectionné:', user.name);
+            selectUser(user);
+        });
+        
         userList.appendChild(userItem);
     });
+    
+    console.log(`${users.length} utilisateurs affichés`);
 }
 
 async function selectUser(user) {
+    console.log('Sélection de l\'utilisateur:', user);
+    
     // Mettre à jour l'interface
     document.querySelectorAll('#chatPage .user-item').forEach(item => {
         item.classList.remove('active');
     });
     
     // Trouver l'élément cliqué et l'activer
-    const clickedItem = Array.from(document.querySelectorAll('#chatPage .user-item')).find(item => 
-        item.textContent.trim() === user.name
-    );
+    const clickedItem = document.querySelector(`[data-user-id="${user.id}"]`);
     if (clickedItem) {
         clickedItem.classList.add('active');
     }
     
-    document.getElementById('chatTitle').textContent = user.name;
-    currentChatId = user.chat_id || user.name; // Utiliser le nom comme ID temporaire
+    const chatTitle = document.getElementById('chatTitle');
+    if (chatTitle) {
+        chatTitle.textContent = user.name;
+    }
+    
+    currentChatId = user.chat_id || user.id;
+    console.log('Chat ID défini:', currentChatId);
     
     // Activer l'input de message
-    document.getElementById('messageInput').disabled = false;
-    document.getElementById('sendBtn').disabled = false;
+    const messageInput = document.getElementById('messageInput');
+    const sendBtn = document.getElementById('sendBtn');
     
-    // Vider la conversation (chaque utilisateur commence avec une conversation vide)
+    if (messageInput) messageInput.disabled = false;
+    if (sendBtn) sendBtn.disabled = false;
+    
+    // Vider la conversation
     clearMessages();
     
     // Dans la vraie implémentation, charger les messages depuis la base de données
     // await loadMessages(user.chat_id);
 }
 
-// Nouvelle fonction pour vider les messages
 function clearMessages() {
     const container = document.getElementById('messagesContainer');
-    container.innerHTML = '<div class="empty-conversation">Aucun message pour l\'instant. Commencez la conversation !</div>';
-}
-
-// Modifier la fonction d'affichage des messages pour gérer les conversations vides
-function displayMessages(messages) {
-    const container = document.getElementById('messagesContainer');
-    
-    if (!messages || messages.length === 0) {
+    if (container) {
         container.innerHTML = '<div class="empty-conversation">Aucun message pour l\'instant. Commencez la conversation !</div>';
-        return;
     }
-    
-    container.innerHTML = '';
-    messages.forEach(message => {
-        displayMessage(message, false);
-    });
-    
-    scrollToBottom('messagesContainer');
 }
 
 async function loadMessages(chatId) {
@@ -284,8 +379,14 @@ async function loadMessages(chatId) {
 
 function displayMessages(messages) {
     const container = document.getElementById('messagesContainer');
-    container.innerHTML = '';
+    if (!container) return;
     
+    if (!messages || messages.length === 0) {
+        container.innerHTML = '<div class="empty-conversation">Aucun message pour l\'instant. Commencez la conversation !</div>';
+        return;
+    }
+    
+    container.innerHTML = '';
     messages.forEach(message => {
         displayMessage(message, false);
     });
@@ -295,6 +396,7 @@ function displayMessages(messages) {
 
 function displayMessage(message, animate = true) {
     const container = document.getElementById('messagesContainer');
+    if (!container) return;
     
     // Supprimer le message "conversation vide" s'il existe
     const emptyMessage = container.querySelector('.empty-conversation');
@@ -331,11 +433,28 @@ function displayMessage(message, animate = true) {
 
 async function sendMessage() {
     const input = document.getElementById('messageInput');
+    if (!input) {
+        console.error('Input message non trouvé');
+        return;
+    }
+    
     const content = input.value.trim();
     
-    if (content === '' || !currentChatId) return;
+    if (content === '') {
+        console.log('Message vide, envoi annulé');
+        return;
+    }
+    
+    if (!currentChatId) {
+        console.log('Aucun chat sélectionné');
+        alert('Veuillez sélectionner un utilisateur pour commencer une conversation');
+        return;
+    }
+    
+    console.log('Envoi du message:', content, 'vers', currentChatId);
     
     try {
+        /* Version avec API réelle :
         const response = await fetch(`${config.apiBaseUrl}/chats/${currentChatId}/messages`, {
             method: 'POST',
             headers: window.defaultHeaders,
@@ -357,6 +476,19 @@ async function sendMessage() {
         } else {
             alert('Erreur lors de l\'envoi du message');
         }
+        */
+        
+        // Simulation pour test
+        const simulatedMessage = {
+            content: content,
+            sender_id: config.currentUserId,
+            created_at: new Date().toISOString()
+        };
+        displayMessage(simulatedMessage, true);
+        input.value = '';
+        
+        console.log('Message envoyé avec succès');
+        
     } catch (error) {
         console.error('Erreur lors de l\'envoi:', error);
         
@@ -376,22 +508,35 @@ async function sendMessage() {
 // ============================================
 
 function selectPriority(priority) {
+    console.log('Sélection de la priorité:', priority);
+    
     document.querySelectorAll('.priority-btn').forEach(btn => {
         btn.classList.remove('active');
     });
     
-    document.querySelector(`[data-priority="${priority}"]`).classList.add('active');
-    selectedPriority = priority;
+    const selectedBtn = document.querySelector(`[data-priority="${priority}"]`);
+    if (selectedBtn) {
+        selectedBtn.classList.add('active');
+        selectedPriority = priority;
+        console.log('Priorité définie:', selectedPriority);
+    }
 }
 
 function sendAlert() {
     const alertInput = document.getElementById('alertInput');
+    if (!alertInput) {
+        console.error('Input alerte non trouvé');
+        return;
+    }
+    
     const content = alertInput.value.trim();
     
     if (content === '') {
         alert('Veuillez saisir un message d\'alerte');
         return;
     }
+    
+    console.log('Envoi de l\'alerte:', content, 'priorité:', selectedPriority);
     
     const alertData = {
         priority: selectedPriority,
@@ -409,6 +554,11 @@ function sendAlert() {
 
 function displayNewAlert(alertData) {
     const container = document.getElementById('alertMessagesContainer');
+    if (!container) {
+        console.error('Container alertes non trouvé');
+        return;
+    }
+    
     const alertDiv = document.createElement('div');
     
     alertDiv.className = `alert-message ${alertData.priority}`;
@@ -438,46 +588,11 @@ function displayNewAlert(alertData) {
 function loadExistingAlerts() {
     console.log('Chargement des alertes existantes...');
     // Les alertes sont déjà dans le HTML pour la démo
-    // Dans la vraie implémentation:
-    /*
-    fetch('/api/alerts')
-        .then(response => response.json())
-        .then(alerts => {
-            const container = document.getElementById('alertMessagesContainer');
-            container.innerHTML = '';
-            alerts.forEach(alert => displayNewAlert(alert));
-        })
-        .catch(error => console.error('Erreur lors du chargement des alertes:', error));
-    */
 }
 
 function sendAlertToBackend(alertData) {
     console.log('Envoi de l\'alerte au backend:', alertData);
-    
-    // Dans la vraie implémentation:
-    /*
-    fetch('/api/alerts', {
-        method: 'POST',
-        headers: window.defaultHeaders,
-        body: JSON.stringify(alertData)
-    })
-    .then(response => response.json())
-    .then(result => {
-        console.log('Alerte envoyée avec succès:', result);
-        
-        // Diffuser via WebSocket
-        if (socket && socket.readyState === WebSocket.OPEN) {
-            socket.send(JSON.stringify({
-                type: 'send_alert',
-                alert: result
-            }));
-        }
-    })
-    .catch(error => {
-        console.error('Erreur lors de l\'envoi de l\'alerte:', error);
-        alert('Erreur lors de l\'envoi de l\'alerte');
-    });
-    */
+    // Implémentation backend à faire
 }
 
 // ============================================
@@ -486,7 +601,9 @@ function sendAlertToBackend(alertData) {
 
 function scrollToBottom(containerId) {
     const container = document.getElementById(containerId);
-    container.scrollTop = container.scrollHeight;
+    if (container) {
+        container.scrollTop = container.scrollHeight;
+    }
 }
 
 function escapeHtml(text) {
@@ -547,7 +664,6 @@ function showNotification(message) {
 // ANIMATIONS CSS DYNAMIQUES
 // ============================================
 
-// Ajouter les animations manquantes
 const style = document.createElement('style');
 style.textContent = `
     @keyframes slideInRight {
