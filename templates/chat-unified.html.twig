@@ -18,7 +18,6 @@
                 {% for conversation in conversations %}
                     <div class="user-item">{% if conversation.utilisateur1.id == current_user.id %}{{ conversation.utilisateur2.Prénom }} {{conversation.utilisateur2.Nom }}{% else %}{{ conversation.utilisateur1.Prénom }} {{conversation.utilisateur1.Nom }} {% endif %}</div>
                 {% endfor %}
-
             </div>
             
             <div class="alerts-section" id="alertsBtn">
