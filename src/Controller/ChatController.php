@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Security;
 
@@ -35,7 +36,7 @@ final class ChatController extends AbstractController
     }
 
     #[Route('/chat/new', name: 'app_new_chat')]
-    public function newChat() {
+    public function newChat(Request $request) {
 
     }
 }
