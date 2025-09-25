@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -45,6 +47,31 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column]
     private ?bool $isActive = null;
+
+    /**
+     * @var Collection<int, Conversation>
+     */
+    #[ORM\ManyToMany(targetEntity: Conversation::class, mappedBy: 'Utilisateur1')]
+    private Collection $conversations;
+
+    /**
+     * @var Collection<int, Message>
+     */
+    #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'Envoyeur', orphanRemoval: true)]
+    private Collection $messages;
+
+    /**
+     * @var Collection<int, Conversation>
+     */
+    #[ORM\OneToMany(targetEntity: Conversation::class, mappedBy: 'utilisateur1', orphanRemoval: true)]
+    private Collection $conversations1;
+
+    public function __construct()
+    {
+        $this->conversations = new ArrayCollection();
+        $this->messages = new ArrayCollection();
+        $this->conversations1 = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -183,6 +210,93 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setIsActive(bool $isActive): static
     {
         $this->isActive = $isActive;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Conversation>
+     */
+    public function getConversations(): Collection
+    {
+        return $this->conversations;
+    }
+
+    public function addConversation(Conversation $conversation): static
+    {
+        if (!$this->conversations->contains($conversation)) {
+            $this->conversations->add($conversation);
+            $conversation->addUtilisateur1($this);
+        }
+
+        return $this;
+    }
+
+    public function removeConversation(Conversation $conversation): static
+    {
+        if ($this->conversations->removeElement($conversation)) {
+            $conversation->removeUtilisateur1($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Message>
+     */
+    public function getMessages(): Collection
+    {
+        return $this->messages;
+    }
+
+    public function addMessage(Message $message): static
+    {
+        if (!$this->messages->contains($message)) {
+            $this->messages->add($message);
+            $message->setEnvoyeur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMessage(Message $message): static
+    {
+        if ($this->messages->removeElement($message)) {
+            // set the owning side to null (unless already changed)
+            if ($message->getEnvoyeur() === $this) {
+                $message->setEnvoyeur(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Conversation>
+     */
+    public function getConversations1(): Collection
+    {
+        return $this->conversations1;
+    }
+
+    public function addConversations1(Conversation $conversations1): static
+    {
+        if (!$this->conversations1->contains($conversations1)) {
+            $this->conversations1->add($conversations1);
+            $conversations1->setUtilisateur1($this);
+        }
+
+        return $this;
+    }
+
+    public function removeConversations1(Conversation $conversations1): static
+    {
+        if ($this->conversations1->removeElement($conversations1)) {
+            // set the owning side to null (unless already changed)
+            if ($conversations1->getUtilisateur1() === $this) {
+                $conversations1->setUtilisateur1(null);
+            }
+        }
 
         return $this;
     }
