@@ -123,16 +123,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Variables JavaScript pour le backend -->
-    <script>
-        window.chatConfig = {
-            apiBaseUrl: '/api',
-            currentUserId: 1, // À remplacer par la vraie valeur du backend
-            csrfToken: 'demo-token', // À remplacer par le vrai token CSRF
-            socketUrl: 'ws://localhost:3000'
-        };
-    </script>
-    <script src="unified-script.js"></script>
+    <script src="{{ asset('js/unified-script.js') }}"></script>
 </body>
 </html>
