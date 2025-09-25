@@ -1,48 +1,63 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BROADCOM - Chat Interface</title>
     <link rel="stylesheet" href="{{asset('css/unified-style.css')}}">
-    <meta name="csrf-token" content="demo-csrf-token">>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <meta name="csrf-token" content="{{csrf_token()}}">
 </head>
 <body>
     
     <div id="chatPage" class="page active">
         <div class="sidebar">
-            <div class="sidebar-header">
-                BroadCom
+            <div class="sidebar-header jaini-font">
+                BROADCOM
+            </div>
+            
+            <!-- NOUVEAU : Section d'invitation -->
+            <div class="invite-section">
+                <button class="invite-btn" id="inviteUserBtn">
+                    ➕ INVITER UN UTILISATEUR
+                </button>
             </div>
             
             <div class="user-list" id="userList">
-                
-                <div class="user-item active">Utilisateur 1</div>
-                
+                <!-- Les utilisateurs seront ajoutés dynamiquement -->
+                <div class="user-item active" data-user-id="1">
+                    <span class="user-status online"></span>
+                    Utilisateur 1
+                    <span class="unread-badge">3</span>
+                </div>
+                <div class="user-item" data-user-id="2">
+                    <span class="user-status offline"></span>
+                    Utilisateur 2
+                </div>
             </div>
             
-            <div class="alerts-section" id="alertsBtn">
+            <div class="alerts-section jaini-font" id="alertsBtn">
                 ALERTES
             </div>
         </div>
 
         <div class="chat-container">
             <div class="chat-header">
-                <div class="chat-title" id="chatTitle">Utilisateur 1</div>
+                <div class="chat-title jaini-font" id="chatTitle">Utilisateur 1</div>
                 <div class="header-actions">
-                    <span id="currentUser">Utilisateur</span>
-                    <button class="quit-btn" id="quitBtnChat">Quitter</button>
+                    <span id="currentUser" class="jaini-font">UTILISATEUR ACTUEL</span>
+                    <button class="quit-btn jaini-font" id="quitBtnChat">Quitter</button>
                 </div>
             </div>
             
             <div class="messages-container" id="messagesContainer">
-                <!-- Messages vides au début - seront chargés dynamiquement -->
+                <div class="empty-conversation jaini-font">AUCUN MESSAGE POUR L'INSTANT. COMMENCEZ LA CONVERSATION !</div>
             </div>
             
             <div class="message-input-container">
                 <div class="message-input-wrapper">
-                    <input type="text" class="message-input" id="messageInput" placeholder="Tapez votre message...">
-                    <button class="send-btn" id="sendBtn">Envoyer</button>
+                    <input type="text" class="message-input" id="messageInput" placeholder="Tapez votre message..." disabled>
+                    <button class="send-btn jaini-font" id="sendBtn" disabled>Envoyer</button>
                 </div>
             </div>
         </div>
@@ -51,71 +66,94 @@
     <!-- Page d'Alertes -->
     <div id="alertPage" class="page">
         <div class="sidebar">
-            <div class="sidebar-header">
-                BroadCom
+            <div class="sidebar-header jaini-font">
+                BROADCOM
             </div>
             
             <div class="user-list">
-                <div class="user-item active">📢 ALERTES GROUPE</div>
+                <div class="user-item active jaini-font">📢 ALERTES GROUPE</div>
             </div>
             
-            <div class="alerts-section active">
+            <div class="alerts-section active jaini-font">
                 ALERTES
             </div>
         </div>
 
         <div class="chat-container">
             <div class="chat-header">
-                <div class="chat-title">📢 ALERTES - Message de Groupe</div>
+                <div class="chat-title jaini-font">📢 ALERTES - MESSAGE DE GROUPE</div>
                 <div class="header-actions">
-                    <button class="quit-btn" id="quitBtnAlert">Quitter</button>
+                    <button class="quit-btn jaini-font" id="quitBtnAlert">Retour</button>
                 </div>
             </div>
             
             <div class="messages-container" id="alertMessagesContainer">
                 <div class="alert-message urgent">
                     <div class="alert-header">
-                        <span class="alert-badge urgent">URGENT</span>
-                        <span class="alert-time">14:30</span>
+                        <span class="alert-badge urgent jaini-font">URGENT</span>
+                        <span class="alert-time jaini-font">14:30</span>
                     </div>
                     <div class="alert-content">Maintenance serveur prévue à 16h00. Veuillez sauvegarder vos données.</div>
-                    <div class="alert-sender">- Admin</div>
+                    <div class="alert-sender jaini-font">- Admin</div>
                 </div>
                 
                 <div class="alert-message important">
                     <div class="alert-header">
-                        <span class="alert-badge important">IMPORTANT</span>
-                        <span class="alert-time">13:15</span>
+                        <span class="alert-badge important jaini-font">IMPORTANT</span>
+                        <span class="alert-time jaini-font">13:15</span>
                     </div>
                     <div class="alert-content">Nouvelle politique de sécurité en vigueur dès demain.</div>
-                    <div class="alert-sender">- Direction</div>
+                    <div class="alert-sender jaini-font">- Direction</div>
                 </div>
                 
                 <div class="alert-message information">
                     <div class="alert-header">
-                        <span class="alert-badge information">INFORMATION</span>
-                        <span class="alert-time">12:00</span>
+                        <span class="alert-badge information jaini-font">INFORMATION</span>
+                        <span class="alert-time jaini-font">12:00</span>
                     </div>
                     <div class="alert-content">Pause déjeuner prolongée aujourd'hui jusqu'à 14h.</div>
-                    <div class="alert-sender">- RH</div>
+                    <div class="alert-sender jaini-font">- RH</div>
                 </div>
             </div>
             
             <div class="alert-input-container">
                 <div class="alert-priority-selector">
-                    <h4>Sélectionnez le niveau d'alerte :</h4>
+                    <h4 class="jaini-font">SÉLECTIONNEZ LE NIVEAU D'ALERTE :</h4>
                     <div class="priority-buttons">
-                        <button class="priority-btn urgent" data-priority="urgent">URGENT</button>
-                        <button class="priority-btn important" data-priority="important">IMPORTANT</button>
-                        <button class="priority-btn information active" data-priority="information">INFORMATION</button>
+                        <button class="priority-btn urgent jaini-font" data-priority="urgent">URGENT</button>
+                        <button class="priority-btn important jaini-font" data-priority="important">IMPORTANT</button>
+                        <button class="priority-btn information active jaini-font" data-priority="information">INFORMATION</button>
                     </div>
                 </div>
                 
                 <div class="message-input-wrapper">
                     <textarea class="alert-input" id="alertInput" placeholder="Tapez votre message d'alerte..." rows="3"></textarea>
-                    <button class="send-alert-btn" id="sendAlertBtn">ENVOYER ALERTE</button>
+                    <button class="send-alert-btn jaini-font" id="sendAlertBtn">ENVOYER ALERTE</button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Modal d'invitation -->
+    <div class="modal" id="inviteModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title jaini-font">INVITER UN NOUVEL UTILISATEUR</h3>
+            </div>
+            <form id="inviteForm">
+                <div class="form-group">
+                    <label class="form-label jaini-font" for="inviteUsername">NOM D'UTILISATEUR :</label>
+                    <input type="text" class="form-input" id="inviteUsername" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label jaini-font" for="inviteEmail">EMAIL :</label>
+                    <input type="email" class="form-input" id="inviteEmail" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">INVITER</button>
+                    <button type="button" class="btn btn-secondary" id="cancelInviteBtn">ANNULER</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -124,10 +162,10 @@
         window.chatConfig = {
             apiBaseUrl: '/api',
             currentUserId: 1, // À remplacer par la vraie valeur du backend
-            csrfToken: 'demo-token', // À remplacer par le vrai token CSRF
+            csrfToken: '{{csrf_token()}}', // Token CSRF de Symfony
             socketUrl: 'ws://localhost:3000'
         };
     </script>
-    <script src="unified-script.js"></script>
+    <script src="{{asset('js/unified-script.js')}}"></script>
 </body>
 </html>
