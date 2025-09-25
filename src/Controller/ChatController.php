@@ -33,4 +33,9 @@ final class ChatController extends AbstractController
             'conversations' => $conversations,
         ]);
     }
+
+    #[Route('/chat/new', name: 'app_new_chat')]
+    public function newChat() {
+
+    }
 }
