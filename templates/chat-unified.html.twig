@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BROADCOM - Chat Interface</title>
-    <link rel="stylesheet" href="{{asset('css/unified-style.css')}}">
+    <link rel="stylesheet" href="unified-style.css">
     <meta name="csrf-token" content="demo-csrf-token">>
 </head>
 <body>
-    <!-- Page de Chat -->
+    
     <div id="chatPage" class="page active">
         <div class="sidebar">
             <div class="sidebar-header">
@@ -16,9 +16,9 @@
             </div>
             
             <div class="user-list" id="userList">
-                {% for conversation in conversations %}
-                    <div class="user-item">{% if conversation.utilisateur1.id == current_user.id %}{{ conversation.utilisateur2.Prénom }} {{conversation.utilisateur2.Nom }}{% else %}{{ conversation.utilisateur1.Prénom }} {{conversation.utilisateur1.Nom }} {% endif %}</div>
-                {% endfor %}
+                
+                <div class="user-item active">Utilisateur 1</div>
+                
             </div>
             
             <div class="alerts-section" id="alertsBtn">
@@ -30,19 +30,13 @@
             <div class="chat-header">
                 <div class="chat-title" id="chatTitle">Utilisateur 1</div>
                 <div class="header-actions">
-                    <span id="currentUser">{{ current_user.Identifiant }}</span>
-                    <form action="{{path('app_logout')}}">
-                        <button class="quit-btn" id="quitBtnChat" type="submit">Se déconnecter</button>
-                    </form>
+                    <span id="currentUser">Utilisateur</span>
+                    <button class="quit-btn" id="quitBtnChat">Quitter</button>
                 </div>
             </div>
             
             <div class="messages-container" id="messagesContainer">
-                {% for conversation in conversations %}
-                    {% for message in conversation.getMessages() %}
-                        <div>{{ message.texte }}</div>
-                    {% endfor %}
-                {% endfor %}
+                <!-- Messages vides au début - seront chargés dynamiquement -->
             </div>
             
             <div class="message-input-container">
