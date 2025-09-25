@@ -1,30 +1,207 @@
 {# templates/admin/dashboard.html.twig #}
-{% extends '@EasyAdmin/layout.html.twig' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BROADCOM - Administration</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="{{asset('css/admin.css')}}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+</head>
+<body>
+    <!-- Page Gestion Utilisateurs -->
+    <div id="usersPage" class="page active">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                BroadCom
+            </div>
+            
+            <div class="nav-list">
+                <div class="nav-item active" data-page="users">
+                    <i class="fas fa-users"></i> Comptes
+                </div>
+                <div class="nav-item" data-page="alerts">
+                    <i class="fas fa-exclamation-triangle"></i> ALERTES
+                </div>
+            </div>
+        </div>
 
-{% block main %}
-    <table class="table" >
-    <thead>
-        <tr>
-            <th>Id</th>
-            <th>Nom</th>
-            <th>Prénom</th>
-            <th>Pin</th>
-        </tr>
-    </thead>
-    <tbody>
-    {% for user in users %}
-        <tr name="elements" id="{{ user.id}}">
-            <td>{{ user.id }}</td>
-            <td>{{ user.nom }}</td>
-            <td>{{ user.prénom }}</td>
-            <td>{{ user.pin }}</td>
-            </td>
-        </tr>
-    {% else %}
-        <tr>
-            <td colspan="10">Rien a afficher</td>
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
-{% endblock main %}
+        <div class="main-container">
+            <div class="header">
+                <h1>Utilisateurs</h1>
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+            
+            <div class="content">
+                <div class="table-controls">
+                    <button class="add-btn" id="addUserBtn">+ Comptes</button>
+                </div>
+                
+                <div class="table-container">
+                    <table class="users-table">
+                        <thead>
+                            <tr>
+                                <th>Identifiant</th>
+                                <th>Nom</th>
+                                <th>Prénom</th>
+                                <th>Appartement</th>
+                                <th>Immeuble</th>
+                                <th>Dernière connexion</th>
+                                <th>Actif/Désactif</th>
+                                <th>Modifier</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <!-- Les utilisateurs seront chargés dynamiquement -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page Gestion Alertes -->
+    <div id="alertsPage" class="page">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                BroadCom
+            </div>
+            
+            <div class="nav-list">
+                <div class="nav-item" data-page="users">
+                    <i class="fas fa-users"></i> Comptes
+                </div>
+                <div class="nav-item active" data-page="alerts">
+                    <i class="fas fa-exclamation-triangle"></i> ALERTES
+                </div>
+            </div>
+        </div>
+
+        <div class="main-container">
+            <div class="header">
+                <h1>ALERTES</h1>
+                <div class="alert-filters">
+                    <button class="filter-btn urgent" data-filter="urgent">Urgent</button>
+                    <button class="filter-btn important" data-filter="important">Important</button>
+                    <button class="filter-btn information" data-filter="information">Information</button>
+                </div>
+                <button class="logout-btn" id="logoutBtn2">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+            
+            <div class="content">
+                <div class="alerts-container" id="alertsContainer">
+                    <!-- Les alertes seront chargées dynamiquement -->
+                </div>
+                
+                <div class="alert-input-section">
+                    <div class="alert-priority-selector">
+                        <h4>Sélectionnez le niveau d'alerte :</h4>
+                        <div class="priority-buttons">
+                            <button class="priority-btn urgent" data-priority="urgent">Urgent</button>
+                            <button class="priority-btn important" data-priority="important">Important</button>
+                            <button class="priority-btn information active" data-priority="information">Information</button>
+                        </div>
+                    </div>
+                    
+                    <div class="message-input-wrapper">
+                        <textarea class="alert-input" id="adminAlertInput" placeholder="Tapez votre message d'alerte..." rows="3"></textarea>
+                        <button class="send-alert-btn" id="sendAdminAlertBtn">Envoyer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Ajouter/Modifier Utilisateur -->
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Ajouter un utilisateur</h3>
+                <span class="close-btn" id="closeModal">&times;</span>
+            </div>
+            <form id="userForm">
+                <div class="form-group">
+                    <label for="userName">Nom :</label>
+                    <input type="text" id="userName" name="nom" required>
+                </div>
+                <div class="form-group">
+                    <label for="userPrenom">Prénom :</label>
+                    <input type="text" id="userPrenom" name="prenom" required>
+                </div>
+                <div class="form-group">
+                    <label for="userAppartement">Appartement :</label>
+                    <input type="text" id="userAppartement" name="appartement" required>
+                </div>
+                <div class="form-group">
+                    <label for="userImmeuble">Immeuble :</label>
+                    <input type="text" id="userImmeuble" name="immeuble" required>
+                </div>
+                <div class="form-group">
+                    <label for="userPin">Code PIN :</label>
+                    <input type="password" id="userPin" name="pin" required maxlength="6" placeholder="Code PIN à 6 chiffres">
+                </div>
+                <div class="form-group">
+                    <label for="userPassword">Mot de passe :</label>
+                    <input type="password" id="userPassword" name="password" required placeholder="Mot de passe pour la connexion">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="cancel-btn" id="cancelModal">Annuler</button>
+                    <button type="submit" class="save-btn">Sauvegarder</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Modifier Alerte -->
+    <div id="alertModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Modifier l'alerte</h3>
+                <span class="close-btn" id="closeAlertModal">&times;</span>
+            </div>
+            <form id="alertForm">
+                <div class="form-group">
+                    <label for="alertStatus">Statut :</label>
+                    <select id="alertStatus" name="status" required>
+                        <option value="active">Actif</option>
+                        <option value="inactive">Inactif</option>
+                        <option value="archived">Archivé</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="alertPriority">Priorité :</label>
+                    <select id="alertPriority" name="priority" required>
+                        <option value="urgent">Urgent</option>
+                        <option value="important">Important</option>
+                        <option value="information">Information</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="alertContent">Contenu :</label>
+                    <textarea id="alertContent" name="content" rows="4" required></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="cancel-btn" id="cancelAlertModal">Annuler</button>
+                    <button type="submit" class="save-btn">Sauvegarder</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Configuration JavaScript pour le backend -->
+    <script>
+        window.adminConfig = {
+            apiBaseUrl: '{{ url('api/admin') }}',
+            currentAdminId: {{ app.user ? app.user.id : 'null' }},
+            csrfToken: '{{ csrf_token() }}',
+            socketUrl: '{{ app.environment.SOCKET_URL|default("ws://localhost:3000") }}'
+        };
+    </script>
+    <script src="admin.js"></script>
+</body>
+</html>
