@@ -13,6 +13,6 @@ class MainController extends AbstractController
     #[Route('/', name: 'app_main')]
     public function main(): Response
     {
-        return $this->getUser()->is_authenticated() ? $this->redirectToRoute('login') : $this->redirectToRoute('chat');
+        return $this->redirectToRoute('chat');
     }
 }

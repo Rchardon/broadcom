@@ -35,7 +35,7 @@
                     </form>
                 </div>
             </div>
-            
+
             <div class="messages-container" id="messagesContainer">
                 {% for conversation in conversations %}
                     {% for message in conversation.getMessages() %}
@@ -78,33 +78,34 @@
             </div>
             
             <div class="messages-container" id="alertMessagesContainer">
-                <div class="alert-message urgent">
-                    <div class="alert-header">
-                        <span class="alert-badge urgent">URGENT</span>
-                        <span class="alert-time">14:30</span>
-                    </div>
-                    <div class="alert-content">Maintenance serveur prévue à 16h00. Veuillez sauvegarder vos données.</div>
-                    <div class="alert-sender">- Admin</div>
-                </div>
-                
-                <div class="alert-message important">
-                    <div class="alert-header">
-                        <span class="alert-badge important">IMPORTANT</span>
-                        <span class="alert-time">13:15</span>
-                    </div>
-                    <div class="alert-content">Nouvelle politique de sécurité en vigueur dès demain.</div>
-                    <div class="alert-sender">- Direction</div>
-                </div>
-                
-                <div class="alert-message information">
-                    <div class="alert-header">
-                        <span class="alert-badge information">INFORMATION</span>
-                        <span class="alert-time">12:00</span>
-                    </div>
-                    <div class="alert-content">Pause déjeuner prolongée aujourd'hui jusqu'à 14h.</div>
-                    <div class="alert-sender">- RH</div>
-                </div>
-            </div>
+                {% for alerte in alertes %}
+                    {% if alerte.type == 'urgent' %}
+                        <div class="alert-message urgent">
+                            <div class="alert-header">
+                                <span class="alert-badge urgent">URGENT</span>
+                            </div>
+                            <div class="alert-content">{{ alerte.texte }}</div>
+                        </div>
+                    {% endif %}
+
+                    {% if alerte.type == 'important' %}
+                        <div class="alert-message important">
+                            <div class="alert-header">
+                                <span class="alert-badge important">IMPORTANT</span>
+                            </div>
+                            <div class="alert-content">{{ alerte.texte }}</div>
+                        </div>
+                    {% endif %}
+
+                    {% if alerte.type == 'information' %}
+                        <div class="alert-message information">
+                            <div class="alert-header">
+                                <span class="alert-badge information">INFORMATION</span>
+                            </div>
+                            <div class="alert-content">{{ alerte.texte }}</div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
             
             <div class="alert-input-container">
                 <div class="alert-priority-selector">
@@ -117,8 +118,10 @@
                 </div>
                 
                 <div class="message-input-wrapper">
-                    <textarea class="alert-input" id="alertInput" placeholder="Tapez votre message d'alerte..." rows="3"></textarea>
-                    <button class="send-alert-btn" id="sendAlertBtn">ENVOYER ALERTE</button>
+                    <form action="{{path('app_new_alerte')}}">
+                        <textarea class="alert-input" id="alertInput" placeholder="Tapez votre message d'alerte..." rows="3"></textarea>
+                        <button class="send-alert-btn" id="sendAlertBtn" type="submit">ENVOYER ALERTE</button>
+                    </form>
                 </div>
             </div>
         </div>

@@ -541,7 +541,6 @@ function sendAlert() {
     const alertData = {
         priority: selectedPriority,
         content: content,
-        sender: getCurrentUser(),
         timestamp: new Date().toISOString()
     };
     
@@ -630,10 +629,6 @@ function updateUserStatus(userId, status) {
 function updateUserList() {
     // Recharger la liste des utilisateurs pour les notifications
     loadUsers();
-}
-
-function getCurrentUser() {
-    return 'Utilisateur Actuel'; // À adapter selon votre système d'auth
 }
 
 function showNotification(message) {
