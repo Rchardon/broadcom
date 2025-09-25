@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Jaini&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="{{asset('css/login.css')}}">
+    <link rel="stylesheet" href="{{ asset('css/login.css') }}">
 </head>
 <body>
     <!-- Page de Connexion -->
@@ -94,112 +94,5 @@
             </div>
         </div>
     </div>
-
-    <!-- Message de succès -->
-    <div id="successPage" class="page">
-        <div class="app-title">BROADCOM</div>
-        
-        <div class="container">
-            <div class="form-container">
-                <div style="text-align: center; padding: 20px;">
-                    <i class="fas fa-check-circle" style="font-size: 4rem; color: #4caf50; margin-bottom: 20px;"></i>
-                    <h1>Mot de passe modifié !</h1>
-                    <p class="success-message">Votre mot de passe a été modifié avec succès.</p>
-                    <button type="button" id="backToLogin">Retour à la connexion</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Navigation entre les pages
-        const pages = document.querySelectorAll('.page');
-        
-        function showPage(pageId) {
-            pages.forEach(page => page.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
-        }
-        
-        // Gestion du lien "Mot de passe oublié"
-        document.getElementById('forgotPasswordLink').addEventListener('click', function(e) {
-            e.preventDefault();
-            showPage('pinPage');
-        });
-        
-        // Boutons annuler
-        document.getElementById('cancelPin').addEventListener('click', function() {
-            showPage('loginPage');
-        });
-        
-        document.getElementById('cancelReset').addEventListener('click', function() {
-            showPage('loginPage');
-        });
-        
-        document.getElementById('backToLogin').addEventListener('click', function() {
-            showPage('loginPage');
-        });
-        
-        // Gestion du formulaire PIN
-        document.getElementById('pinForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const pin = document.getElementById('pinCode').value;
-            
-            // Simulation de validation PIN (à remplacer par votre logique)
-            if (pin.length >= 4) {
-                showPage('resetPage');
-            } else {
-                alert('Veuillez saisir un code PIN valide');
-            }
-        });
-        
-        // Gestion du formulaire de reset password
-        document.getElementById('resetForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const newPassword = document.getElementById('newPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            
-            if (newPassword !== confirmPassword) {
-                alert('Les mots de passe ne correspondent pas');
-                return;
-            }
-            
-            if (newPassword.length < 8) {
-                alert('Le mot de passe doit contenir au moins 8 caractères');
-                return;
-            }
-            
-            // Simulation de sauvegarde (à remplacer par votre logique)
-            showPage('successPage');
-        });
-        
-        // Gestion du formulaire de connexion
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            
-            // Ajoutez votre logique de connexion ici
-            console.log('Tentative de connexion:', username);
-            
-            // Exemple de simulation d'erreur
-            if (username === '' || password === '') {
-                const errorDiv = document.getElementById('errorMessage');
-                errorDiv.textContent = 'Veuillez remplir tous les champs';
-                errorDiv.style.display = 'block';
-            } else {
-                // Redirection ou traitement de la connexion réussie
-                console.log('Connexion réussie');
-            }
-        });
-        
-        // Masquer les messages d'erreur lors de la saisie
-        document.getElementById('username').addEventListener('input', function() {
-            document.getElementById('errorMessage').style.display = 'none';
-        });
-        
-        document.getElementById('password').addEventListener('input', function() {
-            document.getElementById('errorMessage').style.display = 'none';
-        });
-    </script>
 </body>
 </html>
