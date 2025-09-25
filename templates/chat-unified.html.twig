@@ -23,7 +23,7 @@
 
         <div class="chat-container">
             <div class="chat-header">
-                <div class="chat-title" id="chatTitle">Utilisateur 1</div>
+                <div class="chat-title" id="chatTitle">{% if conversation.utilisateur1.id == current_user.id %}{{ conversation.utilisateur2.Prénom }} {{conversation.utilisateur2.Nom }}{% else %}{{ conversation.utilisateur1.Prénom }} {{conversation.utilisateur1.Nom }} {% endif %}</div>
                 <div class="header-actions">
                     <span id="currentUser">{{ current_user.Identifiant }}</span>
                     <form action="{{path('app_logout')}}">
