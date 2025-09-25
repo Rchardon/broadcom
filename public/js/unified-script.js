@@ -7,8 +7,7 @@ const config = window.chatConfig;
 let currentChatId = null;
 let socket = null;
 let selectedPriority = 'information';
-let currentPage = 'chat';
-let connectedUsers = new Map(); // Pour tracker les utilisateurs connectés
+let currentPage = 'chat'; // 'chat' ou 'alert'
 
 // ============================================
 // INITIALISATION
@@ -25,8 +24,7 @@ function initializeApp() {
     setupAjaxHeaders();
     
     if (!config.currentUserId) {
-        console.log('Pas d\'utilisateur connecté, redirection vers login');
-        // window.location.href = 'login.html';
+        window.location.href = 'login.html';
         return;
     }
 }
@@ -40,7 +38,7 @@ function setupAjaxHeaders() {
 }
 
 // ============================================
-// WEBSOCKET POUR TEMPS RÉEL
+// WEBSOCKET
 // ============================================
 
 function connectWebSocket() {
@@ -65,15 +63,9 @@ function connectWebSocket() {
                 console.log('WebSocket fermé - tentative de reconnexion...');
                 setTimeout(connectWebSocket, 3000);
             };
-            
-            socket.onerror = function(error) {
-                console.error('Erreur WebSocket:', error);
-            };
         } catch (error) {
-            console.error('Erreur connexion WebSocket:', error);
+            console.error('Erreur WebSocket:', error);
         }
-    } else {
-        console.log('Mode sans WebSocket - fonctionnalités en local uniquement');
     }
 }
 
@@ -81,31 +73,17 @@ function handleWebSocketMessage(data) {
     switch(data.type) {
         case 'new_message':
             if (data.chatId === currentChatId && currentPage === 'chat') {
-                displayMessage(data.message, true);
-                // Marquer comme lu
-                markMessagesAsRead(data.chatId);
-            } else {
-                // Augmenter le compteur de messages non lus
-                updateUnreadCount(data.message.sender_id, 1);
-                showNotification(`Nouveau message de ${data.message.sender_name}!`, 'info');
+                displayMessage(data.message, false);
             }
+            updateUserList();
             break;
         case 'new_alert':
             if (currentPage === 'alert') {
                 displayNewAlert(data.alert);
             }
-            showNotification('Nouvelle alerte reçue!', 'info');
             break;
         case 'user_status':
             updateUserStatus(data.userId, data.status);
-            break;
-        case 'user_joined':
-            addNewUser(data.user);
-            showNotification(`${data.user.name} a rejoint la conversation!`, 'success');
-            break;
-        case 'user_invited':
-            // Actualiser la liste des utilisateurs
-            loadUsers();
             break;
     }
 }
@@ -121,11 +99,8 @@ function showPage(pageName) {
     });
     
     // Afficher la page demandée
-    const targetPage = document.getElementById(pageName + 'Page');
-    if (targetPage) {
-        targetPage.classList.add('active');
-        currentPage = pageName;
-    }
+    document.getElementById(pageName + 'Page').classList.add('active');
+    currentPage = pageName;
     
     // Actions spécifiques selon la page
     if (pageName === 'alert') {
@@ -141,93 +116,46 @@ function setupEventListeners() {
     // ========== NAVIGATION ==========
     
     // Bouton ALERTES
-    const alertsBtn = document.getElementById('alertsBtn');
-    if (alertsBtn) {
-        alertsBtn.addEventListener('click', function() {
-            showPage('alert');
-        });
-    }
+    document.getElementById('alertsBtn').addEventListener('click', function() {
+        showPage('alert');
+    });
     
     // Bouton Quitter - Page Chat
-    const quitBtnChat = document.getElementById('quitBtnChat');
-    if (quitBtnChat) {
-        quitBtnChat.addEventListener('click', function() {
-            if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
-                // window.location.href = 'login.html';
-                showNotification('Déconnexion simulée', 'info');
-            }
-        });
-    }
-    
-    // Bouton Retour - Page Alert
-    const quitBtnAlert = document.getElementById('quitBtnAlert');
-    if (quitBtnAlert) {
-        quitBtnAlert.addEventListener('click', function() {
-            showPage('chat');
-        });
-    }
-
-    // ========== INVITATION D'UTILISATEURS ==========
-    
-    // Bouton d'invitation
-    const inviteUserBtn = document.getElementById('inviteUserBtn');
-    if (inviteUserBtn) {
-        inviteUserBtn.addEventListener('click', function() {
-            openInviteModal();
-        });
-    }
-    
-    // Modal d'invitation
-    const cancelInviteBtn = document.getElementById('cancelInviteBtn');
-    if (cancelInviteBtn) {
-        cancelInviteBtn.addEventListener('click', function() {
-            closeInviteModal();
-        });
-    }
-    
-    // Formulaire d'invitation
-    const inviteForm = document.getElementById('inviteForm');
-    if (inviteForm) {
-        inviteForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            inviteUser();
-        });
-    }
-    
-    // Fermer modal en cliquant à l'extérieur
-    const inviteModal = document.getElementById('inviteModal');
-    if (inviteModal) {
-        inviteModal.addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeInviteModal();
-            }
-        });
-    }
-
-    // Fermer modal avec Escape
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            closeInviteModal();
+    document.getElementById('quitBtnChat').addEventListener('click', function() {
+        if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+            window.location.href = 'login.html';
         }
+    });
+    
+    // Bouton Quitter - Page Alert
+    document.getElementById('quitBtnAlert').addEventListener('click', function() {
+        showPage('chat');
     });
 
     // ========== CHAT NORMAL ==========
     
     // Envoi de message chat
-    const sendBtn = document.getElementById('sendBtn');
-    if (sendBtn) {
-        sendBtn.addEventListener('click', sendMessage);
-    }
+    document.getElementById('sendBtn').addEventListener('click', sendMessage);
     
-    const messageInput = document.getElementById('messageInput');
-    if (messageInput) {
-        messageInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-            }
+    document.getElementById('messageInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+    
+    // Sélection d'utilisateurs
+    document.querySelectorAll('#chatPage .user-item').forEach(item => {
+        item.addEventListener('click', function() {
+            if (this.textContent.includes('📢')) return; // Ignorer l'item alertes
+            
+            selectUser({
+                id: Math.random(), // Simulation
+                name: this.textContent,
+                chat_id: Math.random()
+            });
         });
-    }
+    });
 
     // ========== ALERTES ==========
     
@@ -239,148 +167,17 @@ function setupEventListeners() {
     });
 
     // Envoi d'alerte
-    const sendAlertBtn = document.getElementById('sendAlertBtn');
-    if (sendAlertBtn) {
-        sendAlertBtn.addEventListener('click', sendAlert);
-    }
+    document.getElementById('sendAlertBtn').addEventListener('click', sendAlert);
     
-    const alertInput = document.getElementById('alertInput');
-    if (alertInput) {
-        alertInput.addEventListener('keydown', function(e) {
-            if (e.ctrlKey && e.key === 'Enter') {
-                sendAlert();
-            }
-        });
-    }
-}
-
-// ============================================
-// FONCTIONS D'INVITATION
-// ============================================
-
-function openInviteModal() {
-    const modal = document.getElementById('inviteModal');
-    const usernameInput = document.getElementById('inviteUsername');
-    
-    if (modal && usernameInput) {
-        modal.classList.add('active');
-        usernameInput.focus();
-    }
-}
-
-function closeInviteModal() {
-    const modal = document.getElementById('inviteModal');
-    const form = document.getElementById('inviteForm');
-    
-    if (modal) {
-        modal.classList.remove('active');
-    }
-    if (form) {
-        form.reset();
-    }
-}
-
-async function inviteUser() {
-    const usernameInput = document.getElementById('inviteUsername');
-    const emailInput = document.getElementById('inviteEmail');
-    
-    if (!usernameInput || !emailInput) {
-        showNotification('Erreur: Éléments du formulaire introuvables', 'error');
-        return;
-    }
-    
-    const username = usernameInput.value.trim();
-    const email = emailInput.value.trim();
-    
-    if (!username || !email) {
-        showNotification('Veuillez remplir tous les champs', 'error');
-        return;
-    }
-    
-    // Validation email simple
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-        showNotification('Adresse email invalide', 'error');
-        return;
-    }
-    
-    try {
-        // Appel API pour inviter l'utilisateur
-        const response = await fetch(`${config.apiBaseUrl}/users/invite`, {
-            method: 'POST',
-            headers: window.defaultHeaders,
-            body: JSON.stringify({
-                username: username,
-                email: email,
-                invited_by: config.currentUserId
-            })
-        });
-        
-        if (response.ok) {
-            const newUser = await response.json();
-            addNewUser(newUser);
-            showNotification(`${username} a été invité avec succès!`, 'success');
-            closeInviteModal();
-            
-            // Notifier via WebSocket
-            if (socket && socket.readyState === WebSocket.OPEN) {
-                socket.send(JSON.stringify({
-                    type: 'user_invited',
-                    user: newUser
-                }));
-            }
-        } else {
-            const error = await response.json();
-            showNotification(error.message || 'Erreur lors de l\'invitation', 'error');
+    document.getElementById('alertInput').addEventListener('keydown', function(e) {
+        if (e.ctrlKey && e.key === 'Enter') {
+            sendAlert();
         }
-    } catch (error) {
-        console.error('Erreur lors de l\'invitation:', error);
-        
-        // Mode simulation locale
-        const simulatedUser = {
-            id: Date.now(),
-            name: username,
-            email: email,
-            online: false,
-            unread_count: 0
-        };
-        addNewUser(simulatedUser);
-        showNotification(`${username} a été invité (mode local)!`, 'success');
-        closeInviteModal();
-    }
-}
-
-function addNewUser(user) {
-    const userList = document.querySelector('#chatPage .user-list');
-    if (!userList) return;
-    
-    // Vérifier si l'utilisateur existe déjà
-    const existingUser = document.querySelector(`[data-user-id="${user.id}"]`);
-    if (existingUser) {
-        showNotification('Cet utilisateur est déjà dans la liste', 'info');
-        return;
-    }
-    
-    const userItem = document.createElement('div');
-    userItem.className = 'user-item';
-    userItem.dataset.userId = user.id;
-    userItem.innerHTML = `
-        <span class="user-status ${user.online ? 'online' : 'offline'}"></span>
-        ${user.name}
-        ${user.unread_count > 0 ? `<span class="unread-badge">${user.unread_count}</span>` : ''}
-    `;
-    
-    userItem.addEventListener('click', () => selectUser(user));
-    
-    // Insérer avant la section alertes (le dernier élément de la liste)
-    userList.appendChild(userItem);
-    
-    // Ajouter à notre map des utilisateurs
-    connectedUsers.set(user.id, user);
+    });
 }
 
 // ============================================
-// FONCTIONS CHAT AMÉLIORÉES
+// FONCTIONS CHAT
 // ============================================
 
 async function loadUsers() {
@@ -394,34 +191,19 @@ async function loadUsers() {
             displayUsers(users);
         } else {
             console.error('Erreur lors du chargement des utilisateurs');
-            loadDefaultUsers();
         }
     } catch (error) {
         console.error('Erreur réseau:', error);
-        loadDefaultUsers();
     }
-}
-
-function loadDefaultUsers() {
-    // Mode local avec utilisateurs par défaut
-    const defaultUsers = [
-        { id: 1, name: 'Utilisateur 1', online: true, unread_count: 3 },
-        { id: 2, name: 'Utilisateur 2', online: false, unread_count: 0 },
-        { id: 3, name: 'Agent Smith', online: true, unread_count: 1 }
-    ];
-    displayUsers(defaultUsers);
 }
 
 function displayUsers(users) {
     const userList = document.querySelector('#chatPage .user-list');
-    if (!userList) return;
-    
     userList.innerHTML = '';
     
-    users.forEach((user, index) => {
+    users.forEach(user => {
         const userItem = document.createElement('div');
         userItem.className = 'user-item';
-        if (index === 0) userItem.classList.add('active'); // Premier utilisateur actif par défaut
         userItem.dataset.userId = user.id;
         userItem.innerHTML = `
             <span class="user-status ${user.online ? 'online' : 'offline'}"></span>
@@ -431,9 +213,6 @@ function displayUsers(users) {
         
         userItem.addEventListener('click', () => selectUser(user));
         userList.appendChild(userItem);
-        
-        // Ajouter à notre map
-        connectedUsers.set(user.id, user);
     });
 }
 
@@ -443,72 +222,40 @@ async function selectUser(user) {
         item.classList.remove('active');
     });
     
-    // Activer l'utilisateur sélectionné
-    const selectedItem = document.querySelector(`[data-user-id="${user.id}"]`);
-    if (selectedItem) {
-        selectedItem.classList.add('active');
-        // Supprimer le badge de messages non lus
-        const unreadBadge = selectedItem.querySelector('.unread-badge');
-        if (unreadBadge) {
-            unreadBadge.remove();
-        }
+    // Trouver l'élément cliqué et l'activer
+    const clickedItem = Array.from(document.querySelectorAll('#chatPage .user-item')).find(item => 
+        item.textContent.trim() === user.name
+    );
+    if (clickedItem) {
+        clickedItem.classList.add('active');
     }
     
-    const chatTitle = document.getElementById('chatTitle');
-    if (chatTitle) {
-        chatTitle.textContent = user.name;
-    }
-    currentChatId = user.chat_id || `chat_${user.id}`;
+    document.getElementById('chatTitle').textContent = user.name;
+    currentChatId = user.chat_id || user.name; // Utiliser le nom comme ID temporaire
     
     // Activer l'input de message
-    const messageInput = document.getElementById('messageInput');
-    const sendBtn = document.getElementById('sendBtn');
-    if (messageInput && sendBtn) {
-        messageInput.disabled = false;
-        sendBtn.disabled = false;
-        messageInput.placeholder = `Discuter avec ${user.name}...`;
-    }
+    document.getElementById('messageInput').disabled = false;
+    document.getElementById('sendBtn').disabled = false;
     
-    // Charger les messages de cette conversation
-    await loadMessages(currentChatId);
+    // Vider la conversation (chaque utilisateur commence avec une conversation vide)
+    clearMessages();
     
-    // Marquer les messages comme lus
-    markMessagesAsRead(currentChatId);
+    // Dans la vraie implémentation, charger les messages depuis la base de données
+    // await loadMessages(user.chat_id);
 }
 
-async function loadMessages(chatId) {
-    try {
-        const response = await fetch(`${config.apiBaseUrl}/chats/${chatId}/messages`, {
-            headers: window.defaultHeaders
-        });
-        
-        if (response.ok) {
-            const messages = await response.json();
-            displayMessages(messages);
-        } else {
-            // Conversation vide
-            clearMessages();
-        }
-    } catch (error) {
-        console.error('Erreur lors du chargement des messages:', error);
-        // Conversation vide en mode local
-        clearMessages();
-    }
-}
-
+// Nouvelle fonction pour vider les messages
 function clearMessages() {
     const container = document.getElementById('messagesContainer');
-    if (container) {
-        container.innerHTML = '<div class="empty-conversation jaini-font">AUCUN MESSAGE POUR L\'INSTANT. COMMENCEZ LA CONVERSATION !</div>';
-    }
+    container.innerHTML = '<div class="empty-conversation">Aucun message pour l\'instant. Commencez la conversation !</div>';
 }
 
+// Modifier la fonction d'affichage des messages pour gérer les conversations vides
 function displayMessages(messages) {
     const container = document.getElementById('messagesContainer');
-    if (!container) return;
     
     if (!messages || messages.length === 0) {
-        clearMessages();
+        container.innerHTML = '<div class="empty-conversation">Aucun message pour l\'instant. Commencez la conversation !</div>';
         return;
     }
     
@@ -520,9 +267,34 @@ function displayMessages(messages) {
     scrollToBottom('messagesContainer');
 }
 
+async function loadMessages(chatId) {
+    try {
+        const response = await fetch(`${config.apiBaseUrl}/chats/${chatId}/messages`, {
+            headers: window.defaultHeaders
+        });
+        
+        if (response.ok) {
+            const messages = await response.json();
+            displayMessages(messages);
+        }
+    } catch (error) {
+        console.error('Erreur lors du chargement des messages:', error);
+    }
+}
+
+function displayMessages(messages) {
+    const container = document.getElementById('messagesContainer');
+    container.innerHTML = '';
+    
+    messages.forEach(message => {
+        displayMessage(message, false);
+    });
+    
+    scrollToBottom('messagesContainer');
+}
+
 function displayMessage(message, animate = true) {
     const container = document.getElementById('messagesContainer');
-    if (!container) return;
     
     // Supprimer le message "conversation vide" s'il existe
     const emptyMessage = container.querySelector('.empty-conversation');
@@ -532,7 +304,7 @@ function displayMessage(message, animate = true) {
     
     const messageDiv = document.createElement('div');
     
-    const isSent = message.sender_id === config.currentUserId || message.sent;
+    const isSent = message.sender_id === config.currentUserId;
     messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
     messageDiv.innerHTML = `
         <div class="message-content">${escapeHtml(message.content)}</div>
@@ -559,26 +331,15 @@ function displayMessage(message, animate = true) {
 
 async function sendMessage() {
     const input = document.getElementById('messageInput');
-    if (!input) return;
-    
     const content = input.value.trim();
     
-    if (content === '' || !currentChatId) {
-        showNotification('Veuillez saisir un message et sélectionner un utilisateur', 'error');
-        return;
-    }
-    
-    const messageData = {
-        content: content,
-        chat_id: currentChatId,
-        sender_id: config.currentUserId
-    };
+    if (content === '' || !currentChatId) return;
     
     try {
         const response = await fetch(`${config.apiBaseUrl}/chats/${currentChatId}/messages`, {
             method: 'POST',
             headers: window.defaultHeaders,
-            body: JSON.stringify(messageData)
+            body: JSON.stringify({ content: content })
         });
         
         if (response.ok) {
@@ -586,7 +347,6 @@ async function sendMessage() {
             displayMessage(message, true);
             input.value = '';
             
-            // Envoyer via WebSocket pour le temps réel
             if (socket && socket.readyState === WebSocket.OPEN) {
                 socket.send(JSON.stringify({
                     type: 'send_message',
@@ -595,63 +355,19 @@ async function sendMessage() {
                 }));
             }
         } else {
-            throw new Error('Erreur serveur');
+            alert('Erreur lors de l\'envoi du message');
         }
     } catch (error) {
         console.error('Erreur lors de l\'envoi:', error);
         
-        // Mode local - afficher le message immédiatement
-        const localMessage = {
+        // Simulation locale en cas d'erreur
+        const simulatedMessage = {
             content: content,
             sender_id: config.currentUserId,
-            created_at: new Date().toISOString(),
-            sent: true
+            created_at: new Date().toISOString()
         };
-        displayMessage(localMessage, true);
+        displayMessage(simulatedMessage, true);
         input.value = '';
-        
-        // Simuler la réception d'un message après un délai
-        setTimeout(() => {
-            const replyMessage = {
-                content: `Message reçu: "${content}"`,
-                sender_id: parseInt(currentChatId.split('_')[1]) || 2,
-                created_at: new Date().toISOString(),
-                sent: false
-            };
-            displayMessage(replyMessage, true);
-        }, 2000);
-    }
-}
-
-function markMessagesAsRead(chatId) {
-    // Marquer les messages comme lus côté serveur
-    fetch(`${config.apiBaseUrl}/chats/${chatId}/mark-read`, {
-        method: 'POST',
-        headers: window.defaultHeaders
-    }).catch(error => console.error('Erreur marquage lu:', error));
-}
-
-function updateUnreadCount(userId, increment) {
-    const userItem = document.querySelector(`[data-user-id="${userId}"]`);
-    if (!userItem) return;
-    
-    let badge = userItem.querySelector('.unread-badge');
-    if (!badge && increment > 0) {
-        badge = document.createElement('span');
-        badge.className = 'unread-badge';
-        badge.textContent = '0';
-        userItem.appendChild(badge);
-    }
-    
-    if (badge) {
-        const currentCount = parseInt(badge.textContent) || 0;
-        const newCount = Math.max(0, currentCount + increment);
-        
-        if (newCount > 0) {
-            badge.textContent = newCount;
-        } else {
-            badge.remove();
-        }
     }
 }
 
@@ -664,21 +380,16 @@ function selectPriority(priority) {
         btn.classList.remove('active');
     });
     
-    const priorityBtn = document.querySelector(`[data-priority="${priority}"]`);
-    if (priorityBtn) {
-        priorityBtn.classList.add('active');
-        selectedPriority = priority;
-    }
+    document.querySelector(`[data-priority="${priority}"]`).classList.add('active');
+    selectedPriority = priority;
 }
 
 function sendAlert() {
     const alertInput = document.getElementById('alertInput');
-    if (!alertInput) return;
-    
     const content = alertInput.value.trim();
     
     if (content === '') {
-        showNotification('Veuillez saisir un message d\'alerte', 'error');
+        alert('Veuillez saisir un message d\'alerte');
         return;
     }
     
@@ -693,23 +404,21 @@ function sendAlert() {
     sendAlertToBackend(alertData);
     
     alertInput.value = '';
-    showNotification('Alerte envoyée avec succès !', 'success');
+    showNotification('Alerte envoyée avec succès !');
 }
 
 function displayNewAlert(alertData) {
     const container = document.getElementById('alertMessagesContainer');
-    if (!container) return;
-    
     const alertDiv = document.createElement('div');
     
     alertDiv.className = `alert-message ${alertData.priority}`;
     alertDiv.innerHTML = `
         <div class="alert-header">
-            <span class="alert-badge ${alertData.priority} jaini-font">${alertData.priority.toUpperCase()}</span>
-            <span class="alert-time jaini-font">${formatTime(alertData.timestamp)}</span>
+            <span class="alert-badge ${alertData.priority}">${alertData.priority.toUpperCase()}</span>
+            <span class="alert-time">${formatTime(alertData.timestamp)}</span>
         </div>
         <div class="alert-content">${escapeHtml(alertData.content)}</div>
-        <div class="alert-sender jaini-font">- ${alertData.sender}</div>
+        <div class="alert-sender">- ${alertData.sender}</div>
     `;
     
     alertDiv.style.opacity = '0';
@@ -729,11 +438,25 @@ function displayNewAlert(alertData) {
 function loadExistingAlerts() {
     console.log('Chargement des alertes existantes...');
     // Les alertes sont déjà dans le HTML pour la démo
-    // Dans la vraie implémentation, charger depuis l'API
+    // Dans la vraie implémentation:
+    /*
+    fetch('/api/alerts')
+        .then(response => response.json())
+        .then(alerts => {
+            const container = document.getElementById('alertMessagesContainer');
+            container.innerHTML = '';
+            alerts.forEach(alert => displayNewAlert(alert));
+        })
+        .catch(error => console.error('Erreur lors du chargement des alertes:', error));
+    */
 }
 
 function sendAlertToBackend(alertData) {
-    fetch(`${config.apiBaseUrl}/alerts`, {
+    console.log('Envoi de l\'alerte au backend:', alertData);
+    
+    // Dans la vraie implémentation:
+    /*
+    fetch('/api/alerts', {
         method: 'POST',
         headers: window.defaultHeaders,
         body: JSON.stringify(alertData)
@@ -752,7 +475,9 @@ function sendAlertToBackend(alertData) {
     })
     .catch(error => {
         console.error('Erreur lors de l\'envoi de l\'alerte:', error);
+        alert('Erreur lors de l\'envoi de l\'alerte');
     });
+    */
 }
 
 // ============================================
@@ -761,9 +486,7 @@ function sendAlertToBackend(alertData) {
 
 function scrollToBottom(containerId) {
     const container = document.getElementById(containerId);
-    if (container) {
-        container.scrollTop = container.scrollHeight;
-    }
+    container.scrollTop = container.scrollHeight;
 }
 
 function escapeHtml(text) {
@@ -785,69 +508,68 @@ function updateUserStatus(userId, status) {
     if (userElement) {
         userElement.className = `user-status ${status}`;
     }
-    
-    // Mettre à jour notre map
-    if (connectedUsers.has(userId)) {
-        connectedUsers.get(userId).online = (status === 'online');
-    }
+}
+
+function updateUserList() {
+    // Recharger la liste des utilisateurs pour les notifications
+    loadUsers();
 }
 
 function getCurrentUser() {
-    return 'Utilisateur Actuel';
+    return 'Utilisateur Actuel'; // À adapter selon votre système d'auth
 }
 
-function showNotification(message, type = 'success') {
-    // Supprimer les notifications existantes
-    const existingNotifications = document.querySelectorAll('.notification');
-    existingNotifications.forEach(notification => notification.remove());
-    
+function showNotification(message) {
     const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #4caf50;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 5px;
+        z-index: 1000;
+        font-weight: 600;
+        animation: slideInRight 0.3s ease;
+    `;
     notification.textContent = message;
     
     document.body.appendChild(notification);
     
-    // Afficher
-    setTimeout(() => notification.classList.add('show'), 100);
-    
-    // Masquer et supprimer
     setTimeout(() => {
-        notification.classList.remove('show');
+        notification.style.animation = 'slideOutRight 0.3s ease';
         setTimeout(() => notification.remove(), 300);
     }, 3000);
 }
 
 // ============================================
-// INITIALISATION DES DONNÉES LOCALES
+// ANIMATIONS CSS DYNAMIQUES
 // ============================================
 
-// Activer le premier utilisateur par défaut après le chargement
-setTimeout(() => {
-    const firstUser = { id: 1, name: 'Utilisateur 1', chat_id: 'chat_1' };
-    const activeUserItem = document.querySelector('.user-item.active');
-    if (activeUserItem && !currentChatId) {
-        selectUser(firstUser);
+// Ajouter les animations manquantes
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
     }
-}, 1000);
-
-// Gestion de la déconnexion/fermeture de page
-window.addEventListener('beforeunload', function() {
-    if (socket && socket.readyState === WebSocket.OPEN) {
-        socket.send(JSON.stringify({
-            type: 'user_disconnect',
-            userId: config.currentUserId
-        }));
-        socket.close();
+    
+    @keyframes slideOutRight {
+        from {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        to {
+            opacity: 0;
+            transform: translateX(100%);
+        }
     }
-});
-
-// Gestion des erreurs globales
-window.addEventListener('error', function(event) {
-    console.error('Erreur JavaScript:', event.error);
-    showNotification('Une erreur s\'est produite', 'error');
-});
-
-// Log des informations de débogage
-console.log('Application Broadcom Chat initialisée');
-console.log('Configuration:', config);
-console.log('WebSocket supporté:', 'WebSocket' in window);
+`;
+document.head.appendChild(style);
