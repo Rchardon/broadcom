@@ -35,9 +35,12 @@ final class ChatController extends AbstractController
             array_push($conversations, $conversation);
         }
 
+        $form = $this->createForm(ChatType::class, null);
+
         return $this->render('chat-unified.html.twig', [
             'current_user' => $user,
             'conversations' => $conversations,
+            'form' => $form,
         ]);
     }
 
