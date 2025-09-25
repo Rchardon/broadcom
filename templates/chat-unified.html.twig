@@ -40,11 +40,9 @@
                 {% endfor %}
             </div>
             
-            <div class="message-input-container">
-                <div class="message-input-wrapper">
-                    <input type="text" class="message-input" id="messageInput" placeholder="Tapez votre message...">
-                    <button class="send-btn" id="sendBtn">Envoyer</button>
-                </div>
+            <div class="message-input-wrapper">
+                    {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+                    {{ form_widget(form) }}{{ form_end(form) }}
             </div>
         </div>
     </div>

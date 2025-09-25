@@ -13,6 +13,7 @@ use App\Form\AlerteType;
 use App\Form\ChatType;
 use App\Entity\Alerte;
 use App\Entity\Conversation;
+use App\Entity\Message;
 
 final class ChatController extends AbstractController
 {
@@ -41,7 +42,7 @@ final class ChatController extends AbstractController
     }
 
     #[Route('/chat/{id}', name: 'app_conv_chat')]
-    public function convChat(Request $request, Conversation $idConv) {
+    public function convChat(Request $request, EntityManagerInterface $entityManager, Conversation $idConv) {
         $user = $this->getUser();
         if(in_array('ROLE_ADMIN', $user->getRoles())){
             return $this->redirectToRoute('admin');
@@ -65,25 +66,21 @@ final class ChatController extends AbstractController
         }
 
         $message=new Message();
-        $form = $this->createForm(ChatType::class, $alerte);
+        $form = $this->createForm(ChatType::class, $message);
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             // $form->getData() holds the submitted values// but, the original `$task` variable has also been updated$task = $form->getData();
             
-            $alerte = $form->getData();
-            $entityManager->persist($alerte);
+            $message = $form->getData();
+            $entityManager->persist($message);
             $entityManager->flush();
         }
-
-        return $this->render('alertes.html.twig', [
-            'alertes' => $alertes,
-            'form' => $form,
-        ]);
 
         return $this->render('chat-unified.html.twig', [
             'current_user' => $user,
             'conversations' => $vraiConvs,
+            'form' => $form,
         ]);
     }
 }
